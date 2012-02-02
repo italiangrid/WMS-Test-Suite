@@ -1,0 +1,38 @@
+[
+Type = "dag";
+
+nodes = [
+          nodeA = [
+                  description = [
+                                 JobType = "Normal";
+                                 Executable = "/bin/hostname";
+                                 StdOutput  = "std.out";
+                                 StdError   = "std.err";
+                                 OutputSandbox = {"std.out","std.err"};
+                                ];
+                   ];
+ 
+            nodeB = [
+                  description = [
+                                 JobType = "Normal";
+                                 Executable = "/bin/date";
+                                 StdOutput  = "std.out";
+                                 StdError   = "std.err";
+                                 OutputSandbox = {"std.out","std.err"};
+                                ];
+                   ];
+
+            nodeC = [
+                  description = [
+                                 JobType = "Normal";
+                                 Executable = "/bin/date";
+                                 StdOutput  = "std.out";
+                                 StdError   = "std.err";
+                                 OutputSandbox = {"std.out","std.err"};
+                                ];
+                   ];
+    ];
+
+dependencies = { { nodeA, nodeB },{  nodeB, nodeC } };
+
+];

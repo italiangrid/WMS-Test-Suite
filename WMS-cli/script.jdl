@@ -1,0 +1,5 @@
+Executable = "/bin/hostname";
+StdOutput  = "std.out";
+StdError   = "std.err";
+OutputSandbox = {"std.out","std.err"};
+ShallowRewtryCount = 3;

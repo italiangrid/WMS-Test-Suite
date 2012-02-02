@@ -1,0 +1,22 @@
+[
+ Type = "dag";
+ Max_nodes_running = 10;
+
+ Nodes = [
+      		nodeA = [
+			  file= "test_dag.jdl";
+		        ];
+		
+		nodeB = [
+		          file= "test_dag.jdl";
+                        ];
+                
+                nodeC = [
+                          file= "test_dag.jdl";
+                        ];
+
+	];
+
+Dependencies = { {nodeA, nodeB},{nodeB,nodeC} }
+]
+

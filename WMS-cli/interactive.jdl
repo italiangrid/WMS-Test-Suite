@@ -1,0 +1,9 @@
+JobType="Interactive";
+ListenerHost="wmproxy.ceid.upatras.gr";
+ListenerPort=44000;
+ListenerPipeName="/tmp/job-pipe";
+Executable = "job.sh";
+StdOutput  = "std.out";
+StdError   = "std.err";
+InputSandbox = {"job.sh"} ;
+OutputSandbox = {"std.out","std.err"};
