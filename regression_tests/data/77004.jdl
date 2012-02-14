@@ -1,0 +1,8 @@
+[
+Executable="/bin/sleep";
+Arguments="120";
+Stdoutput = "std.out";
+OutputSandbox = {"std.out"};
+Requirements=regexp("8443/cream", other.GlueCEUniqueID);
+MyProxyServer = " ";
+]

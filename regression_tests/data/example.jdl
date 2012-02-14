@@ -1,0 +1,6 @@
+[
+Executable = "/usr/bin/env" ;
+Stdoutput = "env.out" ;
+StdError =  "env.err" ;
+OutputSandbox = { "env.out" ,"env.err" } ;
+]

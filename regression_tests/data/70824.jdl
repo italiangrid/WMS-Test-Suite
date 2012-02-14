@@ -1,0 +1,11 @@
+[ 
+Executable = "/bin/env"; 
+Stdoutput = "env.out" ; 
+StdError = "env.err" ; 
+shallowretrycount = 2; 
+retrycount = 3; 
+OutputSandbox = { "env.out" ,"env.err" } ; 
+Environment = { 
+"ATHENA_RUN_EVENTS='[(152345L, 216721L)]'" 
+};
+]

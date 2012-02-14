@@ -1,0 +1,33 @@
+[
+  nodes = {
+     [
+			nodeName="first";
+      stdOutput="std.out";
+      stdError="std.err";
+      outputsandbox = {"std.out", "std.err"};
+      executable="/bin/ls" ;
+     ],
+     [
+      nodeName="second";
+	    stdOutput="std.out";
+	    stdError="std.err";
+	    outputsandbox = {"std.out", "std.err"};
+	    executable="/bin/ls" ;
+		 ],
+     [
+      nodeName="third";
+      stdOutput="std.out";
+      stdError="std.err";
+      outputsandbox = {"std.out", "std.err"};
+      executable="/bin/ls" ;
+     ]
+  };
+
+  FuzzyRank = true;
+  usertags = [ bug = "31669" ];
+  type = "collection" ;
+  DefaultNodeShallowRetryCount = 13;
+  DefaultNodeRetryCount = 17;
+]
+
+

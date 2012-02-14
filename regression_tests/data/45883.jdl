@@ -1,0 +1,11 @@
+[
+  Executable = "/bin/ls";
+  Arguments = "-l";
+  prologue = "/bin/false";
+  StdOutput = "out.log";
+  StdError = "err.log";
+  OutputSandbox = {"out.log", "err.log"};
+  myproxyserver="";
+  RetryCount = 0;
+  ShallowRetryCount = 3;
+]

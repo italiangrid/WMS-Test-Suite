@@ -1,0 +1,9 @@
+[
+  Executable = "perusal.sh" ;
+  InputSandbox = {"data/perusal.sh"};
+  Stdoutput = "perusal.out" ;
+  StdError =  "perusal.err" ;
+  OutputSandbox ={ "perusal.out" ,"perusal.err"} ;
+  usertags = [ bug = "30900" ];
+  PerusalFileEnable = true;
+]

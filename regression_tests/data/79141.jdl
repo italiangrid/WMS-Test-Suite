@@ -1,0 +1,12 @@
+[
+JobType = "Parametric";
+Parameters = 1;
+ParameterStart = 0;
+ParameterStep = 1;
+Executable = "/bin/ls";
+Requirements = other.GlueCEStateStatus == "Production";
+Arguments = "-la";
+Stdoutput = "output.txt";
+InputSandbox = {"data/79141/Src_PARAM_/Makefile", "data/79141/Test_PARAM_"};
+OutputSandbox = {"output.txt"};
+]

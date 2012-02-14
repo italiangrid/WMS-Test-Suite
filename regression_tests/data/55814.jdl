@@ -1,0 +1,6 @@
+[
+Executable="/bin/sleep";
+Arguments="120";
+Stdoutput = "std.out";
+OutputSandbox = {"std.out"};
+]

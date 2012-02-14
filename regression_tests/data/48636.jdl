@@ -1,0 +1,6 @@
+[
+Executable = "/bin/dd";
+Arguments = "if=/dev/zero of=./huge bs=1024 count=100000";
+InputSandbox = {};
+OutputSandbox = {"huge"};
+]
