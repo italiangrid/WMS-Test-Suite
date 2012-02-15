@@ -266,6 +266,13 @@ def test4(utils,ssh,title):
 
         prefix=JOBID.split("https://%s:9000/"%(utils.get_WMS()))[1][0:2]
 
+        utils.job_status(JOBID)
+
+        while(utils.get_job_status().find("Waiting")!=-1):
+           utils.info("Wait 60 secs. Job's status is Waiting")
+           time.sleep(60)
+           utils.job_status(JOBID)
+
         utils.info("Purge the job")
 
         #WARNING EXECUTE COMMAND AS root INSTEAD OF glite USER
