@@ -52,6 +52,7 @@ class Regression_utils:
         self.fails=[]
         self.WMS_USERNAME=''
         self.WMS_PASSWORD=''
+        self.YAIM_FILE=''
 
 
     def usage(self,msg):
@@ -1446,7 +1447,7 @@ class Regression_utils:
 
     def close_ssh(self,ssh):
 
-        logging.info("Close ssh connection for host %s",host)
+        logging.info("Close ssh connection")
 
         ssh.close()
 
