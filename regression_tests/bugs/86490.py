@@ -27,7 +27,7 @@ def run(utils):
 
     logging.info("Check inside $WMS_LOCATION_VAR/proxycache for expired proxies for more than 6 hours")
 
-    proxies=utils.execute_remote_cmd(ssh,"find %s/proxycache/ -name *.pem"%(wms_location_var)).split("\n")
+    proxies=utils.execute_remote_cmd(ssh,"find %s/proxycache/ -name userproxy.pem"%(wms_location_var)).split("\n")
 
     for proxy in proxies:
 
