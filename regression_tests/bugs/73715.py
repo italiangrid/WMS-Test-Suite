@@ -26,21 +26,30 @@ def run(utils):
         utils.use_utils_jdl()
         utils.set_jdl(utils.get_jdl_file())
         utils.set_destination_ce(utils.get_jdl_name(), dest)
-  
+
         JOBID=Job_utils.submit_wait_finish(utils, dest)
         utils.job_status(JOBID)
-        
+
+        find=0
+
         if utils.JOBSTATUS.find('Done (Success)') != -1 :
 
-            logging.info("Look for the ReallyRunning events in the logging info")
+            logging.info("Look for the ReallyRunning event from LogMonitor in the logging info")
 
             result=utils.run_command_continue_on_error("glite-wms-job-logging-info -v 3 --event ReallyRunning %s"%(JOBID))
-    
-            if result.find("Wn seq") == -1:
-                logging.error("WN sequence code not found")
-                raise GeneralError("Check ReallyRunning events","WN sequence code not found")        
+
+            for line in result.split("\n") :
+                if line.find("Source")!=-1:
+                    source=line.split("=")[1]
+                    if source.find("LogMonitor")!=-1:
+                        find=1
+                        break
+
+            if find == 0:
+                logging.error("Not found ReallyRunning event from LogMonitor")
+                raise GeneralError("Check ReallyRunning events","Not found ReallyRunning event from LogMonitor")
             else:
-                logging.info("Found ReallyRunning events as expected. Test PASS")
+                logging.info("Found ReallyRunning event from LogMonitor as expected. Test PASS")
                 
         else:
             logging.error("Job not finished successfully. Retry the test.")
