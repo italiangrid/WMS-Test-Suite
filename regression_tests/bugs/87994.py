@@ -15,7 +15,6 @@ def run(utils):
 
 
     if utils.YAIM_FILE=='':
-        logging.error("To verify this bug it is necessary to set the YAIM_FILE in the configuration file")
         raise GeneralError("Missing required variable (YAIM_FILE)","To verify this bug it is necessary to set the YAIM_FILE in the configuration file")
     
     logging.info("Start regression test for bug %s"%(bug))
@@ -28,11 +27,13 @@ def run(utils):
 
     utils.ssh_get_file(ssh, "%s"%(target), "%s/local_copy"%(utils.get_tmp_dir()))
 
+    utils.ssh_get_file(ssh, "%s"%(utils.YAIM_FILE), "%s/yaim_local_copy"%(utils.get_tmp_dir()))
+
     ssh.close()
     
     logging.info("Parse yaim file to find all the supported VOs")
 
-    FILE=open(utils.YAIM_FILE,"r")
+    FILE=open("%s/yaim_local_copy"%(utils.get_tmp_dir()),"r")
     yaim=FILE.readlines()
     FILE.close()
 
