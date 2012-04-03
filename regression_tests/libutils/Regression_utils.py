@@ -52,8 +52,12 @@ class Regression_utils:
         self.fails=[]
         self.WMS_USERNAME=''
         self.WMS_PASSWORD=''
+        self.PROXY_PASSWORD=''
         self.YAIM_FILE=''
-
+        self.ROLE=''
+        self.USERNAME=''
+        self.PASSWORD=''
+        self.OTHER_HOST=''
 
     def usage(self,msg):
 
@@ -310,9 +314,22 @@ class Regression_utils:
 
         FILE=open(jdl,"a")
 
+        FILE.write("%s=\"%s\";\n"%(att,value))
+
+        FILE.close()
+
+
+    # add the given couple (att, value) to the jdl (not string value)
+    def add_jdl_general_attribute(self, jdl, att, value):
+
+        logging.info("Add the attribute %s=%s to jdl",att,value)
+
+        FILE=open(jdl,"a")
+
         FILE.write("%s=%s;\n"%(att,value))
 
         FILE.close()
+
 
 
     # define a simple jdl and save it in filename
@@ -919,6 +936,24 @@ class Regression_utils:
             time.sleep(int(self.SLEEP_TIME))
             counter=counter+1
 
+    def wait_until_job_finishes_no_timeout_error(self,jobid):
+
+        logging.info("Wait until job %s finishes ...",jobid)
+
+        logging.info("Iterating %s times and each time wait for %s secs",self.NUM_STATUS_RETRIEVALS,self.SLEEP_TIME)
+
+        counter=0
+
+        while self.job_is_finished(jobid) == 0 :
+
+            if counter >= int(self.NUM_STATUS_RETRIEVALS) :
+                logging.error("Timeout reached while waiting the job %s to finish",jobid)
+                self.run_command_continue_on_error("glite-wms-job-cancel -c %s --noint %s"%(self.get_config_file(),jobid))
+
+            logging.info("Job's %s status is %s ... sleeping %s seconds ( %s/%s )",jobid,self.JOBSTATUS,self.SLEEP_TIME,counter,self.NUM_STATUS_RETRIEVALS)
+            time.sleep(int(self.SLEEP_TIME))
+            counter=counter+1
+
     """
 
     # ... delegate proxy and (re-)define DELEGATION_OPTIONS
@@ -981,6 +1016,7 @@ class Regression_utils:
     # returns 1 if job is DoneOK, 2 if Aborted
     # returns 3 if jobs is Cancelled and 4 if Done (Exit code != 0)
     # returns 5 if jobs is Cleared
+    # returns 6 if job is Done (Failed)
     def job_is_finished(self,jobid):
 
        logging.info('Check if job %s is finished',jobid)
@@ -1010,10 +1046,17 @@ class Regression_utils:
           logging.info("Job %s has been cleared !",jobid)
           return 5
 
+
        # ... go to the next step if it is a success
        if self.JOBSTATUS.find('Done (Success)') != -1 :
          logging.info("Job %s finished !",jobid)
          return 1
+
+
+       if self.JOBSTATUS.find('Done (Failed)') != -1 :
+         logging.info("Job %s finished !",jobid)
+         return 6
+
 
        logging.info('Job %s is not finished yet',jobid)
 
@@ -1402,8 +1445,8 @@ class Regression_utils:
             self.log_traceback("%s"%(self.get_current_test()))
             self.log_traceback(traceback.format_exc())
         except ImportError, e:
-            self.log_error("Unable to find the required module for bug %s"%(target))
-	    self.show_critical("Unable to find the required module for bug %s . Test is skipped"%(target)) 
+            self.show_critical("Unable to find the required module for bug %s . Test is skipped"%(target))
+            self.log_error("Unable to find the required module for bug %s . Test is skipped"%(target))
         except RetryError, e:
             self.show_critical("\tWARNING Test for bug %s should be repeat"%(target))
             self.log_error("%s"%(self.get_current_test()))
@@ -1513,6 +1556,7 @@ class Regression_utils:
            logging.error("Error Description: %s",e)
            raise GeneralError("Method ssh_get_file","Error while transfer file %s from remote host"%(src))
 
+
     #When olds="*" then the method find the current value of the attribute
     def change_remote_file(self,ssh,file,attributes,olds,news):
 
@@ -1586,6 +1630,156 @@ class Regression_utils:
 
             ftp.close()
             
+
+        except Exception, e:
+            logging.error("Error while edit file %s at remote host",file)
+            logging.error("Error Description: %s",e)
+            raise GeneralError("Method change_remote_file","Error while edit file %s at remote host"%(file))
+
+
+    def add_attribute_to_remote_file(self,ssh,file,section,attributes,values):
+
+        logging.info("Add attributes at remote file %s"%(file))
+
+        self.remove("%s/local_copy"%(self.get_tmp_dir()))
+
+        try:
+
+            self.execute_remote_cmd(ssh, "cp -f %s %s.bak"%(file,file))
+
+            ftp = ssh.open_sftp()
+
+            logging.info("Get file %s"%(file))
+
+            #Get required file from remote host
+            ftp.get(file,"%s/local_copy"%(self.get_tmp_dir()))
+
+            logging.info("Read file %s"%(file))
+
+            #Read contents from file
+            FILE=open("%s/local_copy"%(self.get_tmp_dir()),"r")
+            lines=FILE.readlines()
+            FILE.close()
+
+            new_lines=[]
+
+            row=0
+            counter=0
+
+            for line in lines:
+                if line.find("%s"%(section))!=-1:
+                    row=lines.index(line)+1
+
+            new_lines=lines[:row]
+
+            for attribute in attributes:
+
+               add=1
+               
+               logging.info("Check if attribute %s already exists."%(attribute))
+               
+               #Check if already exists
+               for li in lines:
+                 if li.find("%s"%(attribute))!=-1:
+                     logging.info("Attribute %s already exists. Go to next"%(attribute))
+                     add=0
+                     break
+
+               if add==1:
+                  logging.info("Add new attribute %s with value %s"%(attribute,values[counter]))
+                  new_lines.append("    %s = %s;\n"%(attribute,values[counter]))
+
+               counter=counter+1
+
+            new_lines[len(new_lines):]=lines[row:]
+            
+            #write changes to local copy of file
+            logging.info("Save changes to %s/local_copy_new"%(self.get_tmp_dir()))
+            FILE=open("%s/local_copy_new"%(self.get_tmp_dir()),"w")
+            FILE.writelines(new_lines)
+            FILE.close()
+            
+            #Save new file to remote host
+            logging.info("Upload new version of file %s to remote host"%(file))
+            ftp.put("%s/local_copy_new"%(self.get_tmp_dir()),file)
+
+            ftp.close()
+
+
+        except Exception, e:
+            logging.error("Error while edit file %s at remote host",file)
+            logging.error("Error Description: %s",e)
+            raise GeneralError("Method change_remote_file","Error while edit file %s at remote host"%(file))
+
+
+
+    #When olds="*" then the method find the current value of the attribute
+    def change_attribute_at_remote_file_section(self,ssh,file,attribute,section,new):
+
+        logging.info("Change attribute at remote file %s for section %s"%(file,section))
+
+        self.remove("%s/local_copy"%(self.get_tmp_dir()))
+
+        try:
+
+            self.execute_remote_cmd(ssh, "cp -f %s %s.bak"%(file,file))
+
+            ftp = ssh.open_sftp()
+
+            logging.info("Get file %s"%(file))
+
+            #Get required file from remote host
+            ftp.get(file,"%s/local_copy"%(self.get_tmp_dir()))
+
+            logging.info("Read file %s"%(file))
+
+            #Read contents from file
+            FILE=open("%s/local_copy"%(self.get_tmp_dir()),"r")
+            lines=FILE.readlines()
+            config=''.join(lines)
+            FILE.close()
+
+            logging.info("Search section %s"%(section))
+
+            sects=config.split("%s =  ["%(section));
+
+            find=0
+
+            if len(sects)!=2:
+                 logging.error("Unable to find section %s"%(section))
+                 raise GeneralError("Method change_attribute_at_remote_file","Unable to find section %s"%(section))
+            else:
+
+                start_index=lines.index("%s =  [\n"%(section))
+
+                sect_lines=sects[1].split("\n")
+
+                for line in sect_lines:
+
+                    if line.find("%s"%(attribute))!=-1:
+                        attr=line.split("=")
+                        inx=sect_lines.index(line)
+                        line=line.replace(attr[1][:-1].strip(),new)
+                        lines[start_index+inx]="%s\n"%(line)
+                        find=1
+                        break
+              
+                if find==0:
+                    logging.error("Unable to find attribute %s"%(attribute))
+                    raise GeneralError("Method change_remote_file","Unable to find attribute %s"%(attribute))
+
+                #write changes to local copy of file
+                logging.info("Save changes to %s/local_copy"%(self.get_tmp_dir()))
+                FILE=open("%s/local_copy"%(self.get_tmp_dir()),"w")
+                FILE.writelines(lines)
+                FILE.close()
+
+                #Save file again to remote host
+                logging.info("Upload new version of file %s to remote host"%(file))
+                ftp.put("%s/local_copy"%(self.get_tmp_dir()),file)
+
+                ftp.close()
+
 
         except Exception, e:
             logging.error("Error while edit file %s at remote host",file)
