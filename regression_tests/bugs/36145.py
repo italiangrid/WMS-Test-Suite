@@ -25,17 +25,16 @@ def run(utils):
     logging.info("Set DispatcherType=\"jobdir\";  and  Input=\"${WMS_LOCATION_VAR}/workload_manager/jobdir\"; to glite_wms.conf at WMS")
 
     attributes=['DispatcherType','Input']
-    old=['filelist','${WMS_LOCATION_VAR}/workload_manager/input.fl']
-    new=['jobdir','${WMS_LOCATION_VAR}/workload_manager/jobdir']
+    new=['\"jobdir\"','\"${WMS_LOCATION_VAR}/workload_manager/jobdir\"']
   
-    utils.change_remote_file(ssh, "/etc/glite-wms/glite_wms.conf", attributes,old,new)
+    utils.change_attribute_at_remote_file_section(ssh,"/etc/glite-wms/glite_wms.conf",attributes[0],'WorkloadManager',new[0])
+    utils.change_attribute_at_remote_file_section(ssh,"/etc/glite-wms/glite_wms.conf",attributes[1],'WorkloadManager',new[1])
 
     utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
 
     logging.info("Submit the job and wait to finish")
 
-    #We use the same jdl with bug 35250
-    utils.use_external_jdl("35250.jdl")
+    utils.use_external_jdl("%s.jdl"%(bug))
 
     logging.info("Submit the job and wait to finish")
 

@@ -1,0 +1,30 @@
+[
+    type = "dag";
+    DefaultNodeShallowRetryCount = 3;
+
+    nodes = [
+
+      nodeA = [       
+          file ="data/example.jdl" ;
+      ];
+
+      nodeB = [
+          file ="data/example.jdl" ;
+      ];
+
+      nodeC = [
+          description = [
+          Executable = "/bin/echo" ;
+          Arguments = "Arg1 Arg2 Arg3" ;
+          StdOutput = "echo.out" ;
+          StdError =  "echo.err" ;
+          OutputSandbox ={ "echo.out" ,"echo.err"} ;
+          ];
+       ];
+
+       dependencies = {
+        { nodeA, nodeB },
+        { nodeA, nodeC }
+       }
+     ];
+]
