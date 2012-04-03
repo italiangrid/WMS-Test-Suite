@@ -1,30 +1,26 @@
-[
-    type = "dag";
-    DefaultNodeShallowRetryCount = 3;
 
+    type = "dag";
+    DefaultNodeShallowRetryCount = 1;
+    InputSandbox = {"data/Test35250.sh","data/input1.txt"};
+    AllowZippedISB=true;
+   
     nodes = [
 
       nodeA = [       
-          file ="data/example.jdl" ;
+          file ="data/test35250.jdl" ;
       ];
 
       nodeB = [
-          file ="data/example.jdl" ;
+          file ="data/test35250.jdl" ;
       ];
 
       nodeC = [
-          description = [
-          Executable = "/bin/echo" ;
-          Arguments = "Arg1 Arg2 Arg3" ;
-          StdOutput = "echo.out" ;
-          StdError =  "echo.err" ;
-          OutputSandbox ={ "echo.out" ,"echo.err"} ;
-          ];
-       ];
-
+          file="data/test35250.jdl";
+      ];
+       
        dependencies = {
         { nodeA, nodeB },
         { nodeA, nodeC }
        }
      ];
-  ]
+  
