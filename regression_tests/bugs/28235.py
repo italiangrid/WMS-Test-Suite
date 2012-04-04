@@ -12,7 +12,6 @@ from libutils import Job_utils
 
 def test_logic(utils,dest_CE):
 
-
        JOBID=Job_utils.submit_wait_finish(utils,"")
 
        #Check for job status
@@ -34,7 +33,6 @@ def test_logic(utils,dest_CE):
          if line.find("Dest id") !=-1 :
             used_ces.append(line.split("=")[1].strip())
 
-
        for CE in used_ces :
          if CE!=  dest_CE :
           logging.error("Test failed, not found 3 times the name of the previously choosen CE. Target CE: %s while found %s"%(dest_CE,CE))
@@ -42,6 +40,7 @@ def test_logic(utils,dest_CE):
 
 
        logging.info("Test OK")
+
 
 def run(utils):
 
@@ -78,12 +77,10 @@ def run(utils):
 
        logging.info("Execute the test for the CREAM CE: %s"%(CE))
 
-       utils.add_jdl_attribute(utils.get_jdl_file(),'Requirements','other.GlueCEUniqueID==\"%s\"'%(CE))
+       utils.add_jdl_general_attribute(utils.get_jdl_file(),'Requirements','other.GlueCEUniqueID==\"%s\"'%(CE))
 
        test_logic(utils,CE)
-
-   
-       
+    
     logging.info("Check if there is LCG CE available")
 
     CE=''
@@ -100,7 +97,7 @@ def run(utils):
        utils.remove(utils.get_jdl_file())
        utils.use_utils_jdl()
        utils.set_shallow_jdl(utils.get_jdl_file())
-       utils.add_jdl_attribute(utils.get_jdl_file(),'Requirements','other.GlueCEUniqueID==\"%s\"'%(CE))
+       utils.add_jdl_general_attribute(utils.get_jdl_file(),'Requirements','other.GlueCEUniqueID==\"%s\"'%(CE))
 
        test_logic(utils,CE)
        
