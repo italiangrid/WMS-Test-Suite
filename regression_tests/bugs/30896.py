@@ -6,7 +6,7 @@
 #
 
 import logging
-import time
+
 from libutils.Exceptions import *
 
 
@@ -65,11 +65,9 @@ def run(utils):
 
     logging.info("Set MaxInputSandboxFiles=2; to glite_wms.conf at WMS")
 
-    utils.change_remote_file(ssh,"/etc/glite-wms/glite_wms.conf", ['MaxInputSandboxFiles'],['*'],['2'])
+    utils.add_attribute_to_remote_file(ssh, "/etc/glite-wms/glite_wms.conf","WorkloadManagerProxy", ['MaxInputSandboxFiles'],['2'])
 
     utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wmproxy restart")
-
-    time.sleep(5)
 
     #Test attribute MaxInputSandboxFiles
     ret1=test_sandbox_files(utils,bug,1)
@@ -78,11 +76,9 @@ def run(utils):
 
     logging.info("Set MaxOutputSandboxFiles=2; to glite_wms.conf at WMS")
 
-    utils.change_remote_file(ssh,"/etc/glite-wms/glite_wms.conf", ['MaxOutputSandboxFiles'],['*'],['2'])
+    utils.add_attribute_to_remote_file(ssh, "/etc/glite-wms/glite_wms.conf","WorkloadManagerProxy", ['MaxOutputSandboxFiles'],['2'])
 
     utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wmproxy restart")
-
-    time.sleep(5)
     
     #Test attribute MaxOutputSandboxFiles
     ret2=test_sandbox_files(utils,bug,2)
