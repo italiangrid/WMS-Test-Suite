@@ -182,7 +182,48 @@ def test4(utils, title):
 
     return 0
 
-   
+
+def test5(utils, title):
+
+    #
+    utils.show_progress(title)
+    utils.info(title)
+        
+    try:
+
+        ###detected if ROLE attribute is set in configuration file
+        utils.info("Create a proxy certificate with voms roles enabled")
+
+        utils.set_proxy(utils.get_PROXY())
+
+        utils.info("Use existing proxy to contact the server and to sing the new proxy")
+
+        utils.run_command_continue_on_error("voms-proxy-init -noregen")
+               
+        # try to submit with the expired delegation
+        utils.info("Try to submit with that proxy")
+        
+        JOBID=utils.run_command_continue_on_error("glite-wms-job-submit -a --config %s --nomsg %s"%(utils.get_config_file(),utils.get_jdl_file()))
+
+        utils.info("Job submitted successfully")
+
+        utils.info("Cancel submitted job")
+
+        utils.run_command_continue_on_error("glite-wms-job-cancel -c %s --noint %s"%(utils.get_config_file(),JOBID))
+
+        utils.info("TEST PASS") 
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        return 1
+
+    return 0
+
+
             
 def main():
 
@@ -192,6 +233,7 @@ def main():
     tests.append("Test 2: Check --delegationid option")
     tests.append("Test 3: Try to delegate with a short proxy and check the validity")
     tests.append("Test 4: Works with expired proxy")
+    tests.append("Test 5: Works with long chain proxies (ggus ticket 79096)")
 
     utils = Test_utils.Test_utils(sys.argv[0],"Test delegation operation")
 
@@ -219,11 +261,23 @@ def main():
                 
         if all_tests==1 or utils.check_test_enabled(4)==1 :
             if test4(utils, tests[3]):
-                fails.append(tests[3])        
+                fails.append(tests[3])
+
+        if all_tests==1 or utils.check_test_enabled(5)==1 :
+
+           if utils.ROLE!='':
+
+              if test5(utils, tests[4]):
+                fails.append(tests[4])
+
+           else:
+                utils.warn("To run this test you have to set the ROLE attribute for user proxy role at configuration file")
+                utils.show_progress("To run this test you have to set the ROLE attribute for user proxy role at configuration file")
+                
    
     else:
-      utils.warn("There are other two tests which require the user proxy password. Use -i option to enable them")
-      utils.show_progress("There are other two tests which require the user proxy password. Use -i option to enable them")
+      utils.warn("There are other three tests which require the user proxy password. Use -i option to enable them")
+      utils.show_progress("There are other three tests which require the user proxy password. Use -i option to enable them")
 
     
     if len(fails) > 0 :

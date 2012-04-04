@@ -58,7 +58,16 @@ class Test_utils:
         self.WMS_USERNAME=''
         self.WMS_PASSWORD=''
         self.YAIM_FILE=''
-
+        self.ROLE=''
+        self.LFC=''
+        self.SE=''
+        self.ISB_DEST_HOSTNAME=''
+        self.ISB_DEST_USERNAME=''
+        self.ISB_DEST_PASSWORD=''
+        self.OSB_DEST_HOSTNAME=''
+        self.OSB_DEST_USERNAME=''
+        self.OSB_DEST_PASSWORD=''
+        
 
     def usage(self,msg):
 
@@ -110,6 +119,9 @@ class Test_utils:
 
     def get_WMS(self):
         return self.WMS
+
+    def get_LB(self):
+        return self.LB
 
     def get_MYPROXY_SERVER(self):
         return self.MYPROXYSERVER
@@ -402,10 +414,24 @@ class Test_utils:
     # DEFAULTREQ:             Default requirements
     # NUM_STATUS_RETRIEVALS:  Number of retrievals before to stop test (timeout)
     # SLEEP_TIME:             Seconds before the next status check
+    # ROLE:                   voms role
+    # LF:                     LFC hostname
+    # SE:                     SE hostname
     #
     def load_configuration(self,conf):
 
        attributes=['WMS','WMS_USERNAME','WMS_PASSWORD','YAIM_FILE','LB','VO','MYPROXYSERVER','LOG_LEVEL','DEFAULTREQ','NUM_STATUS_RETRIEVALS','SLEEP_TIME']
+
+       attributes.append("ROLE")
+       attributes.append("LFC")
+       attributes.append("SE")
+       attributes.append('ISB_DEST_HOSTNAME')
+       attributes.append('ISB_DEST_USERNAME')
+       attributes.append('ISB_DEST_PASSWORD')
+
+       attributes.append('OSB_DEST_HOSTNAME')
+       attributes.append('OSB_DEST_USERNAME')
+       attributes.append('OSB_DEST_PASSWORD')
 
        FILE = open(conf,"r")
        lines=FILE.readlines()
@@ -589,15 +615,18 @@ class Test_utils:
         FILE.write("[\n")
         FILE.write("NodeName=\"Node_3_jdl\";\n");
         FILE.write("file = \"%s/node.jdl\";\n"%(self.get_tmp_dir()));
+        FILE.write("],\n");
+
+        FILE.write("[\n")
+        FILE.write("NodeName=\"Node_4_jdl\";\n");
+        FILE.write("file = \"%s/node.jdl\";\n"%(self.get_tmp_dir()))
         FILE.write("]\n");
 
-   
         FILE.write("};\n");
         
         FILE.close()
 
         self.dbg("The saved jdl is:\n%s"%(commands.getoutput("cat %s"%(filename))))
-
 
 
     # define a parametric jdl
@@ -890,7 +919,7 @@ class Test_utils:
         
         self.dbg("The saved jdl is:\n%s"%(commands.getoutput("cat %s"%(filename))))
 
-    
+
     #define a jdl which triggers reschedule
     def set_feedback_jdl(self,filename):
 
@@ -910,7 +939,6 @@ class Test_utils:
         FILE.close()
 
         self.dbg("The saved jdl is:\n%s"%(commands.getoutput("cat %s"%(filename))))
-
 
     #define a jdl for gangmathing
     def set_gang_jdl(self,filename):
@@ -961,7 +989,6 @@ class Test_utils:
         self.dbg("The saved jdl is:\n%s"%(commands.getoutput("cat %s"%(filename))))
 
 
-
     # define a script which write 100 messages, one every 15sec
     def create_sleeper(self):
 
@@ -999,7 +1026,8 @@ class Test_utils:
         FILE.close()
         
         self.dbg("The new saved jdl is:\n%s"%(commands.getoutput("cat %s"%(self.JDLFILE))))
-	
+
+
     # add the given couple (att, value) to the jdl (not string value)
     def add_jdl_general_attribute(self, att, value):
 
@@ -1011,7 +1039,7 @@ class Test_utils:
 
         FILE.close()
 
-        self.dbg("The new saved jdl is:\n%s"%(commands.getoutput("cat %s"%(self.JDLFILE))))	
+        self.dbg("The new saved jdl is:\n%s"%(commands.getoutput("cat %s"%(self.JDLFILE))))
 
 
     # change value of the given attribute to the jdl (string value)
@@ -1033,8 +1061,6 @@ class Test_utils:
 
         self.dbg("The new saved jdl is:\n%s"%(commands.getoutput("cat %s"%(self.JDLFILE))))
 
-
-
     # add given requirements to jdl
     def set_requirements(self, requirements):
         
@@ -1048,7 +1074,6 @@ class Test_utils:
         
         self.dbg("The new saved jdl is:\n%s"%(commands.getoutput("cat %s"%(self.JDLFILE))))
 
-    
     # force the destination ce for parallel jobs
     def set_mpi_destination_ce(self,filename, destination_ce):
         
@@ -1057,7 +1082,7 @@ class Test_utils:
     # force the destination ce
     def set_destination_ce(self,filename, destination_ce):
         
-        self.set_requirements("RegExp(\"%s\",other.GlueCEUniqueID);"%(destination_ce))
+        self.set_requirements("RegExp(\"%s\",other.GlueCEUniqueID)"%(destination_ce))
 
 
     ############################################
@@ -1097,10 +1122,14 @@ class Test_utils:
 
     # ... create proxy file with validity "valid_period" (default 24:00)
     def set_proxy(self,proxy,valid_period="24:00"):
-     
-        self.info("Initializing proxy file with voms %s, valid for %s"%(self.VO,valid_period))
 
-        OUTPUT=commands.getstatusoutput("echo %s | voms-proxy-init -voms %s -verify -valid %s -bits 1024 -pwstdin -out %s "%(self.PASS,self.VO,valid_period,proxy))
+        if self.ROLE=='':
+            self.info("Initializing proxy file with voms %s, valid for %s"%(self.VO,valid_period))
+            OUTPUT=commands.getstatusoutput("echo %s | voms-proxy-init -voms %s -verify -valid %s -bits 1024 -pwstdin -out %s "%(self.PASS,self.VO,valid_period,proxy))
+        else:
+            self.info("Initializing proxy file with voms %s, role %s, valid for %s"%(self.VO,self.ROLE,valid_period))
+            OUTPUT=commands.getstatusoutput("echo %s | voms-proxy-init -voms %s:/%s/Role=%s -verify -valid %s -bits 1024 -pwstdin -out %s "%(self.PASS,self.VO,self.VO,self.ROLE,valid_period,proxy))
+
 
         if OUTPUT[0] == 0 :
             self.dbg("voms-proxy-init output: %s"%(OUTPUT[1]))
@@ -1111,7 +1140,7 @@ class Test_utils:
             self.error("voms-proxy-init output : %s"%(OUTPUT[1]))
             self.exit_failure("Failed to create a valid user proxy")
 
-
+    
     # Run command "args", if "fail" is set we expect a command failure (ret code != 0)
     # If command fails (or if "fail"=1 and it not fails), exit with failure 
     # returns command's output
@@ -1167,6 +1196,7 @@ class Test_utils:
             self.info(" -> Command successfully failed")  
 
         return OUTPUT[1]
+
 
 
     # Wait until job "jobid" is done or raise TimeOutError exception if time is out 
@@ -1239,34 +1269,32 @@ class Test_utils:
     #
     def get_cream_jobid(self,jobid):
 
-        self.info("Get CREAM jobid")
+       self.info("Get CREAM jobid")
 
-        cream_jobid=""
+       cream_jobid=""
 
-        output=self.run_command_continue_on_error("glite-wms-job-logging-info -v 2 --event Transfer %s"%(jobid)).split("\n")
+       output=self.run_command_continue_on_error("glite-wms-job-logging-info -v 2 --event Transfer %s"%(jobid)).split("\n")
 
-        for line in output:
+       for line in output:
            if line.find("Dest jobid")!=-1 and line.find("https://")!=-1:
                cream_jobid=line.split("=")[1].strip(" \n\t")
 
-        return cream_jobid
-
+       return cream_jobid
 
     #
     def get_cream_jdl(self,cream_jobid):
 
-        self.info("Get CREAM jdl")
+       self.info("Get CREAM jdl")
 
-        jdl=""
+       jdl=""
 
-        output=self.run_command_continue_on_error("glite-ce-job-status -L 2  %s"%(cream_jobid)).split("\n")
+       output=self.run_command_continue_on_error("glite-ce-job-status -L 2  %s"%(cream_jobid)).split("\n")
 
-        for line in output:
+       for line in output:
            if line.find("JDL")!=-1 :
                jdl=line.strip(" \n\t")
 
-        return jdl
-
+       return jdl
 
     # Extract the "status" of the job "jobid"
     # --> set JOBSTATUS
@@ -1310,7 +1338,6 @@ class Test_utils:
         self.info('Job %s status reason is %s'%(jobid,reason))
 
         return reason
-
 
     # Check if job described in JOBIDFILE is finished
     # returns 0 if job is not finished
@@ -1361,8 +1388,6 @@ class Test_utils:
         else:
             self.info('Job %s is transfered'%(jobid))
             return 1
-
-
 
 
     # store jobIDs from the file "filename" into a list
@@ -1566,9 +1591,8 @@ class Test_utils:
         if self.EXTERNAL_JDL == 0:
             self.JDLFILE="%s/example.jdl"%(self.MYTMPDIR)
         else :
-            name=os.path.basename(self.EXTERNAL_JDL_FILE)
-            os.system("cp %s %s/%s"%(self.EXTERNAL_JDL_FILE,self.MYTMPDIR,name))
-            self.JDLFILE="%s/%s"%(self.MYTMPDIR,name)
+            os.system("cp %s %s/%s"%(self.EXTERNAL_JDL_FILE,self.MYTMPDIR,self.EXTERNAL_JDL_FILE))
+            self.JDLFILE="%s/%s"%(self.MYTMPDIR,self.EXTERNAL_JDL_FILE)
 
 
         # Create default jdl and config file
@@ -1590,6 +1614,5 @@ class Test_utils:
                 voms_info=commands.getstatusoutput("voms-proxy-info -timeleft")
                 if voms_info[1].isdigit() == False :
                     self.exit_failure("I don't find neither create any valid proxy")
-
 
 
