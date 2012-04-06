@@ -24,7 +24,7 @@ def run(utils):
         utils.use_utils_jdl()
         utils.set_jdl(utils.get_jdl_file())
         utils.set_destination_ce(utils.get_jdl_name(), dest)
-        utils.add_jdl_attribute(utils.get_jdl_file(),"Prologue","/bin/false")
+        utils.add_jdl_attribute(utils.get_jdl_file(),"Prologue","\"/bin/false\"")
 
         JOBID=Job_utils.submit_wait_finish(utils,dest)
 
