@@ -286,7 +286,7 @@ def main():
         utils.info ("Test the --user-tag option")
         OUTPUT=utils.run_command_continue_on_error ("%s --noint --config %s -all --user-tag type=\'test job\'"%(COMMAND,utils.get_config_file()))
         utils.run_command_continue_on_error ("grep %s %s"%(JOBID,OUTPUT))
-        utils.run_command_fail_continue_on_error ("%s --noint --config %s --all --user-tag type=\"wrong tag\""%(COMMAND,utils.get_config_file()))
+        utils.run_command_continue_on_error ("%s --noint --config %s --all --user-tag type=\"wrong tag\""%(COMMAND,utils.get_config_file()),1)
 
     except (RunCommandError,GeneralError,TimeOutError) , e :
             fails=fails+1

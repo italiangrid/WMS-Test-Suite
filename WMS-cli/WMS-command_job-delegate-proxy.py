@@ -45,6 +45,7 @@ def main():
 
     utils.info(DELEGATIONID)
 
+    
     # Test if command exists
     utils.show_progress("Test 1")
     logging.info("Test 1: Check if command %s exists",COMMAND)
@@ -320,7 +321,7 @@ def main():
             utils.log_traceback("%s"%(utils.get_current_test()))
             utils.log_traceback(traceback.format_exc())
 
-
+       
        # try with an expiry delegation
        utils.show_progress("Test 12")
 
@@ -337,18 +338,19 @@ def main():
 
             # first try to delegate again with an expired proxy
             utils.info ("Try to delegate with an expired proxy")
-            utils.run_command_fail_continue_on_error("%s --config %s --autm-delegation"%(COMMAND,utils.get_config_file()))
+            #second argument 1 , expect failure message
+            utils.run_command_continue_on_error("%s --config %s --autm-delegation"%(COMMAND,utils.get_config_file()),1)
 
             # refresh the proxy
-            utils.set_proxy (utils.get_PROXY(),"")
+            utils.set_proxy (utils.get_PROXY())
 
             # then check if the old delegation is expired
             utils.info ("Check if the old delegation is expired")
-            utils.run_command_fail_continue_on_error ("glite-wms-job-info  --config %s -d %s | grep Timeleft"%(utils.get_config_file(),DELEGATIONID))
+            utils.run_command_continue_on_error ("glite-wms-job-info  --config %s -d %s | grep Timeleft"%(utils.get_config_file(),DELEGATIONID),1)
 
             # then try to submit with the expired delegation
             utils.info ("Try to submit with an expired delegation")
-            utils.run_command_fail_continue_on_error ("glite-wms-job-submit -d %s --config %s --logfile %s %s"%(DELEGATIONID,utils.get_config_file(),utils.get_log_file(),utils.get_jdl_file()))
+            utils.run_command_continue_on_error ("glite-wms-job-submit -d %s --config %s --logfile %s %s"%(DELEGATIONID,utils.get_config_file(),utils.get_log_file(),utils.get_jdl_file()),1)
             utils.info ("Check the output of the command")
             utils.run_command_continue_on_error ("grep \"The delegated Proxy has expired\" %s"%(utils.get_log_file()))
             utils.remove(utils.get_log_file())
