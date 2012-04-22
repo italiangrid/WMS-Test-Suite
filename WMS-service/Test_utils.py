@@ -1360,7 +1360,7 @@ class Test_utils:
             return 4
         elif self.JOBSTATUS.find('Cleared') != -1 :
             return 5
-        elif self.JOBSTATUS.find('Done (Success)') != -1 :
+        elif self.JOBSTATUS.find('Done (Success)') != -1 or self.JOBSTATUS.find('Done(Success)') != -1 :
             return 1
         else:
             self.info('Job %s is not finished yet'%(jobid))
