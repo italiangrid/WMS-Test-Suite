@@ -292,7 +292,7 @@ def main():
         logging.info("Test 12: Check --get, --nodisplay and --all options")
         utils.info ("")
         utils.info ("Test --get option with --nodisplay and --all")
-        utils.run_command_continue_on_error ("%s --get -f out.txt --noint --nodisplay --all --dir %s/perusal %s"%(COMMAND,utils.get_job_output_dir(),JOBID))
+        utils.run_command_continue_on_error ("%s --get -f out.txt --nodisplay --all --dir %s/perusal %s"%(COMMAND,utils.get_job_output_dir(),JOBID))
 
         logging.info("Execute command: ls %s/perusal/out.txt-*",utils.get_job_output_dir())
 
