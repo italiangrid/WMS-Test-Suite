@@ -33,7 +33,7 @@ def main():
     utils.info ("Check if command %s exists"%(COMMAND))
     utils.run_command ("which %s"%(COMMAND))
 
-    
+
     # Test --version option
     utils.show_progress("Test 2")
 
@@ -833,7 +833,6 @@ def main():
             utils.log_traceback(traceback.format_exc())
     
     
-    
 
     """
     # Test option --dag
@@ -865,22 +864,31 @@ def main():
         logging.info("Test 22: Check --nodes-resource option")
         utils.info ("")
         utils.info ("Test --nodes-resource option")
+
         utils.info ("Look for a usable CE")
 
-        if utils.has_external_jdl() == 0 :
-            utils.set_jdl(utils.get_jdl_file())
+        utils.set_jdl("%s/list.jdl"%(utils.get_tmp_dir()))
 
-        utils.run_command_continue_on_error ("glite-wms-job-list-match --noint --config %s %s --rank --output %s %s"%(utils.get_config_file(),utils.get_delegation_options(),utils.get_output_file(),utils.get_jdl_file()))
+        FILE=open("%s/list.jdl"%(utils.get_tmp_dir()),"a")
+        FILE.write("Requirements=RegExp(\"2119/jobmanager\",other.GlueCEUniqueID);\n")
+        FILE.close()
 
-        logging.info("Execute command: grep \"No Computing Element\" %s",utils.get_output_file())
-        result=commands.getstatusoutput("grep \"No Computing Element\" %s"%(utils.get_output_file()))
+        output=utils.run_command_continue_on_error ("glite-wms-job-list-match --noint --config %s %s %s/list.jdl"%(utils.get_config_file(),utils.get_delegation_options(),utils.get_tmp_dir()))
 
-        if result != 0 :
+        if output.find("No Computing Element")!=-1:
+            logging.warning("No matching CE found. TEST SKIPPED")
+            utils.info ("No matching CE found. Test skipped.")
+            utils.show_critical("No matching CE found. TEST SKIPPED")
+        else:
 
-            CE_ID=utils.run_command_continue_on_error ("awk -F ' ' '/:[[:digit:]]*\// {print $2}' %s | head -1"%(utils.get_output_file()))
+            for line in output.split("\n"):
+                if line.find(" - ")!=-1:
+                    CE_ID=line.split(" - ")[1].strip()
+                    break
 
-            utils.set_dag_jdl(utils.get_jdl_file())
-       
+            if utils.has_external_jdl() == 0 :
+                utils.set_dag_jdl(utils.get_jdl_file())
+      
             JOBID=utils.run_command_continue_on_error ("%s %s --config %s --nomsg --nodes-resource %s %s"%(COMMAND,utils.get_delegation_options(),utils.get_config_file(),CE_ID,utils.get_jdl_file()))
 
             CENAME=utils.get_dag_CE(JOBID)
@@ -888,7 +896,6 @@ def main():
             utils.info ("Check if it has used the right CE")
 
             logging.info("Check if it has used the right CE")
-
 
             if CE_ID != CENAME :
                 logging.error("Job has been submitted to the wrong CE: %s (instead of %s)",CENAME,CE_ID)
@@ -901,9 +908,6 @@ def main():
 
             utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s"%(JOBID))
 
-        else:
-            logging.warning("No matching found. TEST SKIPPED")
-            utils.info ("No matching found. Test skipped.")
 
     except (RunCommandError,GeneralError,TimeOutError) , e :
             fails=fails+1
