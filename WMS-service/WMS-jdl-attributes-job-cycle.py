@@ -82,7 +82,7 @@ def set_jdl_data(utils,filename,dir):
     FILE.write("FuzzyRank = true;\n")
     FILE.write("Environment={\"LFC_HOST=%s\",\"LFC_HOME=%s:%s\"};\n"%(utils.LFC,utils.LFC,dir))
     FILE.write("InputSandbox = {\"%s/test.sh\"};\n"%(utils.get_tmp_dir()))
-    FILE.write("OutputSandbox = {\"std.out\", \"std.err\",\"test.out\"};\n")
+    FILE.write("OutputSandbox = {\"std.out\", \"std.err\",\"file1.txt\"};\n")
 
     FILE.write("DataRequirements = {\n")
     FILE.write("[\n")
