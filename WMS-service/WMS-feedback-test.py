@@ -20,11 +20,11 @@ def test1(utils, title):
 
         CREAMs=[]
 
-        utils.info("Set MaxReplansCount=5; and ReplanGracePeriod=10; to glite_wms.conf at WMS")
+        utils.info("Set MaxReplansCount=5; and ReplanGracePeriod=10; EnableReplanner=true to glite_wms.conf at WMS")
 
         ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
 
-        SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['MaxReplansCount','ReplanGracePeriod','LogLevel'],['*','*','*'],['5','10','6'])
+        SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['MaxReplansCount','ReplanGracePeriod','LogLevel','EnableReplanner'],['*','*','*','*'],['5','3','6','true'])
 
         utils.info("Restart workload manager glite-wms-wm")
 
