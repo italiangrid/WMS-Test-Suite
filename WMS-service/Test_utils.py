@@ -928,7 +928,7 @@ class Test_utils:
         FILE = open(filename,"w")
 
         FILE.write("Executable = \"/bin/sleep\";\n")
-        FILE.write("Arguments = \"3600\";\n")
+        FILE.write("Arguments = \"3\";\n")
         FILE.write("Retrycount = 0;\n")
         FILE.write("Shallowretrycount = 0;\n")
         FILE.write("StdError = \"stderr.log\";\n")
@@ -1362,6 +1362,8 @@ class Test_utils:
             return 5
         elif self.JOBSTATUS.find('Done (Success)') != -1 or self.JOBSTATUS.find('Done(Success)') != -1 :
             return 1
+        elif self.JOBSTATUS.find('Done (Failed)') != -1 or self.JOBSTATUS.find('Done(Failed)') != -1 :
+            return 6
         else:
             self.info('Job %s is not finished yet'%(jobid))
             return 0
