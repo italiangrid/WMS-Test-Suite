@@ -297,54 +297,131 @@ def parallel_submit(utils, title):
 
     return fails
 
-def perusal_submit(utils, title):
 
-    fails=0
+def perusal_submit_test(utils,target):
 
-    utils.show_progress(title)
-    utils.info(title)
-    
+    ret=[0,""]
+
     try:
+
         utils.set_perusal_jdl(utils.get_jdl_file())
+
+        utils.set_destination_ce(utils.get_jdl_file(),target)
+
         JOBID=utils.run_command ("glite-wms-job-submit %s --nomsg -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
         utils.dbg("Job %s has been submitted"%(JOBID))
+
         utils.run_command_continue_on_error ("glite-wms-job-perusal --set --filename out.txt -f std.out %s"%(JOBID))
-        utils.show_critical("BEWARE default min perusal interval is 1000 secs, so this phase could take many minutes")
-        while utils.job_is_finished(JOBID) == 0:
-            utils.dbg("Wait 60 secs ...")
-            time.sleep(60)
-            utils.run_command_continue_on_error ("glite-wms-job-perusal --get -f out.txt --dir %s %s"%(utils.get_job_output_dir(),JOBID))
-        utils.info("Check if some chunckes have been retrieved")
+
+        utils.info("Wait until job's state is Running")
+
+        utils.job_status(JOBID)
+
+        while utils.get_job_status().find("Running")==-1 and utils.job_is_finished(JOBID)==0:
+           time.sleep(30)
+           utils.job_status(JOBID)
+
+        utils.info("Wait for 1010 secs")
+
+        time.sleep(1010)
+
+        utils.run_command_continue_on_error ("glite-wms-job-perusal --get -f out.txt --dir %s %s"%(utils.get_job_output_dir(),JOBID))
+
+        utils.info("Check if some chunkes have been retrieved")
+
         filespec="out.txt-*"
-        chunck=glob.glob(os.path.join(utils.get_job_output_dir(),filespec))
-        if len(chunck):
-            utils.info("These chunckes have been retrieved: %s"%(chunck))
+
+        first_try_chunk=glob.glob(os.path.join(utils.get_job_output_dir(),filespec))
+
+        if len(first_try_chunk):
+            utils.info("These chunks have been retrieved: %s"%(first_try_chunk))
         else:
-            utils.error("TEST FAILS. No chunckes have been retrieved")
-            raise GeneralError("glite-wms-job-perusal --get","No chunckes have been retrieved.")
-            
-        if utils.get_job_status().find("Done") != -1:
-            utils.info("Retrieve the output")
-            utils.run_command_continue_on_error ("glite-wms-job-output --noint --nosubdir --dir %s %s"%(utils.get_job_output_dir(),JOBID)) 
-            if ( ( not os.path.isfile("%s/out.txt"%(utils.get_job_output_dir())) ) or 
-               ( not os.path.isfile("%s/std.out"%(utils.get_job_output_dir()))) ):
-                utils.error("TEST FAILS. Output files have not been retrieved")
-                utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            else:
-                utils.info("TEST PASS.")
+            utils.error("TEST FAILS. No chunks have been retrieved")
+            raise GeneralError("glite-wms-job-perusal --get","No chunks have been retrieved.")
+
+        #first_try_size=os.stat(first_try_chunk[0]).st_size
+
+        utils.info("Wait for another 1010 secs")
+
+        time.sleep(1010)
+
+        utils.run_command_continue_on_error ("glite-wms-job-perusal --get -f out.txt --dir %s %s"%(utils.get_job_output_dir(),JOBID))
+
+        utils.info("Check if some chunks have been retrieved")
+
+        second_try_chunk=glob.glob(os.path.join(utils.get_job_output_dir(),filespec))
+
+        if len(second_try_chunk)>len(first_try_chunk):
+            utils.info("These chunks have been retrieved: %s"%(second_try_chunk))
         else:
-            utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            raise GeneralError("Check output files","Output files are not correctly retrieved")   
-        
+            utils.error("TEST FAILS. No chunks have been retrieved")
+            raise GeneralError("glite-wms-job-perusal --get","No chunks have been retrieved.")
+
+        second_try_chunk.remove(first_try_chunk[0])
+
+        #second_try_size=os.stat(second_try_chunk[0]).st_size
+
+
     except (GeneralError) , e :
         utils.log_error("%s"%(utils.get_current_test()))
         utils.log_error("Command: %s"%(e.expression))
         utils.log_error("Message: %s"%(e.message))
         utils.log_traceback("%s"%(utils.get_current_test()))
         utils.log_traceback(traceback.format_exc())
-        return 1
+        ret[0]=1
+        ret[1]=e.message
+        return ret
+
+    return ret
+
+
+
+def perusal_submit(utils, title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        utils.info("CASE A: Use LCG CE")
+        utils.show_progress("CASE A: Use LCG CE")
+ 
+        result=perusal_submit_test(utils,"2119/jobmanager")
+
+        if result[0] == 1 :
+           fails=fails+1
+           utils.error(result[1])
+        else:
+           utils.info("TEST CASE OK")
+           utils.dbg("Clean job output directory")
+           os.system("rm -rf %s"%(utils.get_job_output_dir()))
+
+        utils.info("CASE B: Use CREAM CE")
+        utils.show_progress("CASE B: Use CREAM CE")
+
+        result=perusal_submit_test(utils,"/cream-")
+
+        if result[0] == 1 :
+           fails=fails+1
+           utils.error(result[1])
+        else:
+           utils.info("TEST CASE OK")
+           utils.dbg("Clean job output directory")
+           os.system("rm -rf %s"%(utils.get_job_output_dir()))
+
+
+    except (GeneralError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        return fails
         
-    return 0
+    return fails
 
 
 def forward_parameters_parallel_jobs(utils, title):
@@ -573,7 +650,7 @@ def main():
     tests.append("Set 3: Submit a parametric job (3 cases LCG-CE, CREAM, general)")
     tests.append("Set 4: Submit a DAG job")
     tests.append("Set 5: Submit a MPI job (3 cases LCG-CE, CREAM, general)")
-    tests.append("Set 6: Submit a perusal job")
+    tests.append("Set 6: Submit a perusal job (2 cases LCG-CE,CREAM)")
     tests.append("Set 7: Submit a bulk of jobs (3 cases LCG-CE, CREAM, general) using a single jdl with al the jdls of nodes")
     tests.append("Set 8: Testing forwarding parameters for parallel jobs")
     tests.append("Set 9: Check different jdls cases for normal job ( submission to LCG-CE and CREAM)")

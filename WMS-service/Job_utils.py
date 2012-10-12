@@ -514,7 +514,7 @@ def get_parametric_job_output(utils,jobid):
 
             utils.info("Check if the output files are correctly retrieved")
 
-            if os.path.isfile("%s/Node_1/ouput1.txt"%(DIR)) & os.path.isfile("%s/Node_1/error1.txt"%(DIR)) & os.path.isfile("%s/Node_3/ouput3.txt"%(DIR)) & os.path.isfile("%s/Node_3/error3.txt"%(DIR)) & os.path.isfile("%s/Node_5/ouput5.txt"%(DIR)) & os.path.isfile("%s/Node_5/error5.txt"%(DIR)) & os.path.isfile("%s/Node_7/ouput7.txt"%(DIR)) & os.path.isfile("%s/Node_7/error7.txt"%(DIR)) &  os.path.isfile("%s/Node_9/ouput9.txt"%(DIR)) & os.path.isfile("%s/Node_9/error9.txt"%(DIR))  :
+            if os.path.isfile("%s/Node_1/output1.txt"%(DIR)) & os.path.isfile("%s/Node_1/error1.txt"%(DIR)) & os.path.isfile("%s/Node_3/output3.txt"%(DIR)) & os.path.isfile("%s/Node_3/error3.txt"%(DIR)) & os.path.isfile("%s/Node_5/output5.txt"%(DIR)) & os.path.isfile("%s/Node_5/error5.txt"%(DIR)) & os.path.isfile("%s/Node_7/output7.txt"%(DIR)) & os.path.isfile("%s/Node_7/error7.txt"%(DIR)) &  os.path.isfile("%s/Node_9/output9.txt"%(DIR)) & os.path.isfile("%s/Node_9/error9.txt"%(DIR))  :
                 utils.info("Output files are correctly retrieved")
                 return ret
             else:
