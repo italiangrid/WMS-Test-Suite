@@ -19,7 +19,7 @@ def check_status(utils,jobid):
 
     utils.job_status(jobid)
 
-    utils.info("Try to check the status 6 times (for a total of 100 seconds)")
+    utils.info("Try to check the status 6 times (for a total of 420 seconds)")
 
     # try to check the status 6 times (for a total of 100 seconds)
     while ( utils.get_job_status().find("Cancelled")==-1 and i<6) :
@@ -28,7 +28,7 @@ def check_status(utils,jobid):
             utils.warn("Job %s final status is: %s."%(jobid,utils.get_job_status()))
             break          
         i+=1
-        time.sleep(i*5)
+        time.sleep(i*20)
         utils.info("Wait %s seconds for the next try"%(i*5))
         utils.job_status(jobid)
         
@@ -53,6 +53,7 @@ def test1(utils, title):
     try:
         
         utils.set_long_jdl(utils.get_jdl_file())
+        utils.set_destination_ce(utils.get_jdl_file(),"/cream-")
 
         JOBID=utils.submit_job()
         
@@ -169,7 +170,7 @@ def test4(utils, title):
 
         utils.set_long_jdl(utils.get_jdl_file())
         
-        Job_utils.prepare_collection_job(utils,utils.get_jdl_file())
+        Job_utils.prepare_collection_job(utils,utils.get_jdl_file(),"/cream-")
 
         utils.dbg("Submit a collection job")
 
@@ -177,8 +178,8 @@ def test4(utils, title):
 
         utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
 
-        utils.dbg("Wait 30 secs")
-        time.sleep(30)
+        utils.dbg("Wait 60 secs")
+        time.sleep(60)
 
         utils.run_command_continue_on_error("glite-wms-job-cancel --config %s --noint %s"%(utils.get_config_file(),JOBID))
 
@@ -220,7 +221,7 @@ def test5(utils, title):
 
         utils.set_long_jdl(utils.get_jdl_file())
         
-        Job_utils.prepare_collection_job(utils,utils.get_jdl_file())
+        Job_utils.prepare_collection_job(utils,utils.get_jdl_file(),"/cream-")
 
         utils.dbg("Submit a collection job")
 
@@ -228,8 +229,8 @@ def test5(utils, title):
 
         utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
 
-        utils.dbg("Wait 30 secs")
-        time.sleep(30)      
+        utils.dbg("Wait 60 secs")
+        time.sleep(60)      
 
         # Get nodes' ids
 
@@ -272,6 +273,7 @@ def test6(utils, title):
 
         # create parametric jdl and required files
         utils.set_parametric_jdl(utils.get_jdl_file())
+        utils.set_destination_ce(utils.get_jdl_file(),"/cream-")
 
         utils.dbg("Submit a parametric job")
 
@@ -279,8 +281,8 @@ def test6(utils, title):
 
         utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
 
-        utils.dbg("Wait 30 secs")
-        time.sleep(30)  
+        utils.dbg("Wait 60 secs")
+        time.sleep(60)  
 
         utils.run_command_continue_on_error("glite-wms-job-cancel --config %s --noint %s"%(utils.get_config_file(),JOBID))
 
@@ -322,6 +324,7 @@ def test7(utils, title):
 
         # create parametric jdl and required files
         utils.set_parametric_jdl(utils.get_jdl_file())
+        utils.set_destination_ce(utils.get_jdl_file(),"/cream-")
 
         utils.dbg("Submit a parametric job")
         
@@ -329,8 +332,8 @@ def test7(utils, title):
 
         utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
 
-        utils.dbg("Wait 10 secs")
-        time.sleep(10)  
+        utils.dbg("Wait 30 secs")
+        time.sleep(30)  
         
         # Get nodes' ids
 
@@ -371,6 +374,7 @@ def test8(utils, title):
 
         # create mpi jdl and required files
         utils.set_mpi_jdl(utils.get_jdl_file())
+        utils.set_destination_ce(utils.get_jdl_file(),"/cream-")
 
         utils.dbg("Submit a MPI job")
 
@@ -378,8 +382,8 @@ def test8(utils, title):
 
         utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
 
-        utils.dbg("Wait 10 secs")
-        time.sleep(10)
+        utils.dbg("Wait 30 secs")
+        time.sleep(30)
 
         utils.run_command_continue_on_error("glite-wms-job-cancel --config %s --noint %s"%(utils.get_config_file(),JOBID))
 
