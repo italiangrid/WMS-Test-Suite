@@ -12,7 +12,6 @@ import Test_utils
 import Job_utils
 import SSH_utils
 
-
 def test1(utils,ssh,title):
 
     utils.show_progress(title)
@@ -147,7 +146,7 @@ def test2(utils,ssh,title):
             utils.info("Retrieve job output")
 
             utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s"%(utils.get_job_output_dir(),JOBID))
-
+            
             utils.info("Check that the SBD has been removed on WMS")
 
             utils.info("Check directory /var/SandboxDir/%s/"%(prefix))
@@ -157,7 +156,7 @@ def test2(utils,ssh,title):
 
             if output.count("total 0")!=1:
                 utils.error("SBD not removed from directory /var/SandboxDir/%s/"%(prefix))
-                raise GeneralError("Check for SBD at /var/SandboxDir/%s/"%(prefix),"Auxiliary files are not removed from directory %s"%(dir2))
+                raise GeneralError("Check for SBD at /var/SandboxDir/%s/"%(prefix),"Auxiliary files are not removed from directory %s"%(dir))
             else:
                 utils.info("SBD has been removed as expected from directory /var/SandboxDir/%s/"%(prefix))
 
@@ -190,7 +189,7 @@ def test3(utils,ssh,title):
 
           utils.info("Check inside $WMS_LOCATION_VAR/proxycache for expired proxies for more than 6 hours")
 
-          proxies=SSH_utils.execute_remote_cmd(ssh,"find %s/proxycache/ -name *.pem"%(wms_location_var)).split("\n")
+          proxies=SSH_utils.execute_remote_cmd(ssh,"find %s/proxycache/ -name \*.pem"%(wms_location_var)).split("\n")
 
           for proxy in proxies:
             
