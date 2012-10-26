@@ -67,13 +67,14 @@ class Test_utils:
         self.OSB_DEST_HOSTNAME=''
         self.OSB_DEST_USERNAME=''
         self.OSB_DEST_PASSWORD=''
-        
+        self.EXTERNAL_REQUIREMENTS=0
+
 
     def usage(self,msg):
 
         print '\nUsage: '
         print ''
-        print '%s [-h] [-l] [-v] [-d <level>] [-c <conf>] [-i] [-W <wms>] [-L <lb>] [-C <ce>] [-V <vo>] [-j <jdl file>] -s -t <tests>'%(msg)
+        print '%s [-h] [-l] [-v] [-d <level>] [-c <conf>] [-i] [-W <wms>] [-L <lb>] [-C <ce>] [-V <vo>] [-j <jdl file>] -s -t <tests> -r <requirements>'%(msg)
         print ''
         print " -h               this help"
         print " -l               save output in a file"
@@ -88,7 +89,7 @@ class Test_utils:
         print " -j <jdl file>    External jdl file"
         print " -s                  List all available tests"
         print " -t <test numbers>   Run specific test cases. Syntax number1,numberK,numberM or number1-numberN or mixed "
-
+        print " -r <requirement>  Set default jdl requirement"
         print ""
 
 
@@ -1472,13 +1473,37 @@ class Test_utils:
         return 0
 
 
+    def get_target_ces(self):
+
+        CES=[]
+        NAMES=[]
+
+        FILE = open(self.CONF,"r")
+        lines=FILE.readlines()
+        FILE.close()
+
+        for line in lines:
+
+           if line.find("=>")!=-1 and line.find("#")==-1:
+
+              line=string.strip(line)
+              ret=line.split("=>",1)
+
+              NAMES.append(ret[0].strip(" \n\t"))
+              CES.append(ret[1].strip(" \n\t"))
+
+        if len(CES)>0:
+            self.EXTERNAL_REQUIREMENTS=1
+
+        return NAMES,CES
+
 
     ###########################################################################
 
     def prepare(self,args,tests):
 
         try:
-            opts,args = getopt.getopt(args,'hlvd:ic:nW:V:L:C:j:st:')
+            opts,args = getopt.getopt(args,'hlvd:ic:nW:V:L:C:j:st:r:')
         except getopt.GetoptError,err:
             print ''
             print str(err)
@@ -1534,6 +1559,9 @@ class Test_utils:
                 self.RUN_ALL=0
                 self.SUBTESTS=value
                 self.parse_test_numbers()
+            elif option=="-r":
+                self.DEFAULTREQ=value
+                self.EXTERNAL_REQUIREMENTS=1
 
         self.START_TIME=strftime("%H:%M:%S")     
 

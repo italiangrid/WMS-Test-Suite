@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python
 
 import sys
 import signal
@@ -12,224 +12,137 @@ import Job_utils
 
 from Exceptions import *
 
+
 def normal_submit(utils, title):
 
     fails=0
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    utils.show_progress("Test 1A: Submit to an LCG-CE")
-    utils.info("\tTest 1A: Submit to an LCG-CE")
+    if len(names)==0:
+        names=["Submit to LCG-CE","Submit to CREAM CE","Submit without restrictions"]
+        ces=["2119/jobmanager","/cream-",""]
 
-    Job_utils.prepare_normal_job(utils,utils.get_jdl_file(),"2119/jobmanager")
 
-    result=Job_utils.submit_only_normal_job(utils,"2119/jobmanager")
+    for i in range(len(names)):
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
+        utils.show_progress("%s - %s"%(title,names[i]))
+        utils.info("%s - %s"%(title,names[i]))
 
-    utils.show_progress("Test 1B: Submit to a CREAM CE")
-    utils.info("\tTest 1B: Submit to a CREAM CE")
+        Job_utils.prepare_normal_job(utils,utils.get_jdl_file(),ces[i])
 
-    Job_utils.prepare_normal_job(utils,utils.get_jdl_file(),"/cream-")
+        result=Job_utils.submit_normal_job(utils,ces[i])
 
-    result=Job_utils.submit_normal_job(utils,"/cream-")
+        if result[0] == 1 :
+            utils.info(result[1])
+            fails=fails+1
+        else:
+            utils.dbg("Clean job output directory")
+            os.system("rm -rf %s"%(utils.get_job_output_dir()))
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-
-    utils.show_progress("Test 1C: Submit without restrictions")
-    utils.info("\tTest 1C: Submit without restrictions")
-
-    Job_utils.prepare_normal_job(utils,utils.get_jdl_file())
-
-    result=Job_utils.submit_normal_job(utils)
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
 
     return fails
+
+
 
 def bulk_submit(utils, title):
 
     fails=0
+
+    names,ces=utils.get_target_ces()
+
+    if len(names)==0:
+        names=["Submit to LCG-CE","Submit to CREAM CE","Submit without restrictions"]
+        ces=["2119/jobmanager","/cream-",""]
+
+
+    for i in range(len(names)):
     
-    utils.show_progress(title)
-    utils.info(title)
+        utils.show_progress("%s - %s"%(title,names[i]))
+        utils.info("%s - %s"%(title,names[i]))
 
-    utils.show_progress("Test 2A: Submit to an LCG-CE")
-    utils.info("\tTest 2A: Submit to an LCG-CE")    
+        Job_utils.prepare_collection_job(utils,utils.get_jdl_file(),ces[i])
 
-    Job_utils.prepare_collection_job(utils,utils.get_jdl_file(),"2119/jobmanager")
+        result=Job_utils.submit_collection_job(utils,ces[i])
 
-    result=Job_utils.submit_collection_job(utils,"2119/jobmanager")
+        if result[0] == 1 :
+            utils.info(result[1])
+            fails=fails+1
+        else:
+            utils.dbg("Clean job output directory")
+            os.system("rm -rf %s"%(utils.get_job_output_dir()))
+            utils.dbg("Clean collection's jdl files")
+            os.system("rm -rf %s/collection_jdls/"%(utils.get_tmp_dir()))
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-        utils.dbg("Clean collection's jdl files")
-        os.system("rm -rf %s/collection_jdls/"%(utils.get_tmp_dir()))
-
-    utils.show_progress("Test 2B: Submit to a CREAM CE")
-    utils.info("\tTest 2B: Submit to a CREAM CE")
-
-    Job_utils.prepare_collection_job(utils,utils.get_jdl_file(),"/cream-")
-
-    result=Job_utils.submit_collection_job(utils,"/cream-")
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-        utils.dbg("Clean collection's jdl files")
-        os.system("rm -rf %s/collection_jdls/"%(utils.get_tmp_dir()))
-
-    utils.show_progress("Test 2C: Submit without restrictions")
-    utils.info("\tTest 2C: Submit without restrictions")
-
-    Job_utils.prepare_collection_job(utils,utils.get_jdl_file())
-
-    result=Job_utils.submit_collection_job(utils)
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-        utils.dbg("Clean collection's jdl files")
-        os.system("rm -rf %s/collection_jdls/"%(utils.get_tmp_dir()))    
     
     return fails
+
 
 
 def bulk_submit_with_single_jdl(utils, title):
 
     fails=0
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    utils.show_progress("Test 7A: Submit to an LCG-CE")
-    utils.info("\tTest 7A: Submit to an LCG-CE")
+    if len(names)==0:
+        names=["Submit to LCG-CE","Submit to CREAM CE","Submit without restrictions"]
+        ces=["2119/jobmanager","/cream-",""]
 
 
-    Job_utils.prepare_single_jdl_for_collection_job(utils,utils.get_jdl_file(),"2119/jobmanager")
+    for i in range(len(names)):
 
-    result=Job_utils.submit_collection_job(utils,"2119/jobmanager",True)
+        utils.show_progress("%s - %s"%(title,names[i]))
+        utils.info("%s - %s"%(title,names[i]))
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-        
-    utils.show_progress("Test 7B: Submit to a CREAM CE")
-    utils.info("\tTest 7B: Submit to a CREAM CE")
+        Job_utils.prepare_single_jdl_for_collection_job(utils,utils.get_jdl_file(),ces[i])
 
-    Job_utils.prepare_single_jdl_for_collection_job(utils,utils.get_jdl_file(),"/cream-")
+        result=Job_utils.submit_collection_job(utils,ces[i],True)
 
-    result=Job_utils.submit_collection_job(utils,"/cream-",True)
+        if result[0] == 1 :
+            utils.info(result[1])
+            fails=fails+1
+        else:
+            utils.dbg("Clean job output directory")
+            os.system("rm -rf %s"%(utils.get_job_output_dir()))
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-     
-
-    utils.show_progress("Test 7C: Submit without restrictions")
-    utils.info("\tTest 7C: Submit without restrictions")
-
-    Job_utils.prepare_single_jdl_for_collection_job(utils,utils.get_jdl_file())
-
-    result=Job_utils.submit_collection_job(utils,"",True)
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-        
+    
     return fails
     
     
 def parametric_submit(utils, title):
 
     fails=0
-    
-    utils.show_progress(title)
-    utils.info(title)
 
-    utils.show_progress("Test 3A: Submit to an LCG-CE")
-    utils.info("\tTest 3A: Submit to an LCG-CE")     
+    names,ces=utils.get_target_ces()
 
-    Job_utils.prepare_parametric_job(utils,utils.get_jdl_file(),"2119/jobmanager")
+    if len(names)==0:
+        names=["Submit to LCG-CE","Submit to CREAM CE","Submit without restrictions"]
+        ces=["2119/jobmanager","/cream-",""]
 
-    result=Job_utils.submit_parametric_job(utils,"2119/jobmanager")
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
+    for i in range(len(names)):
 
-    utils.show_progress("Test 3B: Submit to a CREAM CE")
-    utils.info("\tTest 3B: Submit to a CREAM CE")
+        utils.show_progress("%s - %s"%(title,names[i]))
+        utils.info("%s - %s"%(title,names[i]))
 
-    Job_utils.prepare_parametric_job(utils,utils.get_jdl_file(),"/cream-")
+        Job_utils.prepare_parametric_job(utils,utils.get_jdl_file(),ces[i])
 
-    result=Job_utils.submit_parametric_job(utils,"/cream-")
+        result=Job_utils.submit_parametric_job(utils,ces[i])
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-
-    utils.show_progress("Test 3C: Submit without restrictions")
-    utils.info("\tTest 3C: Submit without restrictions")
-
-    Job_utils.prepare_parametric_job(utils,utils.get_jdl_file())
-
-    result=Job_utils.submit_parametric_job(utils)
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))   
+        if result[0] == 1 :
+            utils.info(result[1])
+            fails=fails+1
+        else:
+            utils.dbg("Clean job output directory")
+            os.system("rm -rf %s"%(utils.get_job_output_dir()))
 
     return fails
+
     
 def dag_submit(utils, title):
 
     # Dag jobs can be submitted only to LCG-CE
-
     utils.show_progress(title)
     utils.info(title)
 
@@ -246,67 +159,51 @@ def dag_submit(utils, title):
     
     return 0
         
+
 def parallel_submit(utils, title):
 
     fails=0
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    utils.show_progress("Test 5A: Submit to an LCG-CE")
-    utils.info("\tTest 5A: Submit to an LCG-CE")   
+    if len(names)==0:
+        names=["Submit to LCG-CE","Submit to CREAM CE","Submit without restrictions"]
+        ces=["2119/jobmanager","/cream-",""]
 
-    Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"2119/jobmanager")
 
-    result=Job_utils.submit_mpi_job(utils,"2119/jobmanager")
+    for i in range(len(names)):
 
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
+        utils.show_progress("%s - %s"%(title,names[i]))
+        utils.info("%s - %s"%(title,names[i]))
+
+        Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),ces[i])
+
+        result=Job_utils.submit_mpi_job(utils,ces[i])
+
+        if result[0] == 1 :
+            utils.info(result[1])
+            fails=fails+1
+        else:
+            utils.dbg("Clean job output directory")
+            os.system("rm -rf %s"%(utils.get_job_output_dir()))
         
-    utils.show_progress("Test 5B: Submit to a CREAM CE")
-    utils.info("\tTest 5B: Submit to a CREAM CE")
-
-    Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"/cream-")
-
-    result=Job_utils.submit_mpi_job(utils,"/cream-")
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-
-    utils.show_progress("Test 5C: Submit without restrictions")
-    utils.info("\tTest 5C: Submit without restrictions")
-
-    Job_utils.prepare_mpi_job(utils,utils.get_jdl_file())
-
-    result=Job_utils.submit_mpi_job(utils)
-
-    if result[0] == 1 :
-        utils.info(result[1])
-        fails=fails+1
-    else:
-        utils.dbg("Clean job output directory")
-        os.system("rm -rf %s"%(utils.get_job_output_dir()))
-
+    
     return fails
 
 
 def perusal_submit_test(utils,target):
-
+    
     ret=[0,""]
 
     try:
 
         utils.set_perusal_jdl(utils.get_jdl_file())
 
-        utils.set_destination_ce(utils.get_jdl_file(),target)
+        if target !="":
+           if utils.EXTERNAL_REQUIREMENTS==0:
+                utils.set_destination_ce(utils.get_jdl_file(),target)
+           else:
+                utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
 
         JOBID=utils.run_command ("glite-wms-job-submit %s --nomsg -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
@@ -379,47 +276,40 @@ def perusal_submit_test(utils,target):
 
 def perusal_submit(utils, title):
 
-    utils.show_progress(title)
-    utils.info(title)
-
     fails=0
 
-    try:
+    names,ces=utils.get_target_ces()
 
-        utils.info("CASE A: Use LCG CE")
-        utils.show_progress("CASE A: Use LCG CE")
- 
-        result=perusal_submit_test(utils,"2119/jobmanager")
-
-        if result[0] == 1 :
-           fails=fails+1
-           utils.error(result[1])
-        else:
-           utils.info("TEST CASE OK")
-           utils.dbg("Clean job output directory")
-           os.system("rm -rf %s"%(utils.get_job_output_dir()))
-
-        utils.info("CASE B: Use CREAM CE")
-        utils.show_progress("CASE B: Use CREAM CE")
-
-        result=perusal_submit_test(utils,"/cream-")
-
-        if result[0] == 1 :
-           fails=fails+1
-           utils.error(result[1])
-        else:
-           utils.info("TEST CASE OK")
-           utils.dbg("Clean job output directory")
-           os.system("rm -rf %s"%(utils.get_job_output_dir()))
+    if len(names)==0:
+        names=["Submit to LCG-CE","Submit to CREAM CE"]
+        ces=["2119/jobmanager","/cream-"]
 
 
-    except (GeneralError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return fails
+    for i in range(len(names)):
+
+        try:
+
+            utils.show_progress("%s - %s"%(title,names[i]))
+            utils.info("%s - %s"%(title,names[i]))
+            
+            result=perusal_submit_test(utils,ces[i])
+
+            if result[0] == 1 :
+               fails=fails+1
+               utils.error(result[1])
+            else:
+               utils.info("TEST CASE OK")
+               utils.dbg("Clean job output directory")
+               os.system("rm -rf %s"%(utils.get_job_output_dir()))
+
+
+        except (GeneralError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
         
     return fails
 
@@ -428,232 +318,231 @@ def forward_parameters_parallel_jobs(utils, title):
 
     fails=0
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
-
-        utils.show_progress("Test 8: Case 1")
-        utils.info("\tTest 8: Case 1")
-
-        Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"/cream-")
-
-        utils.change_jdl_attribute("CpuNumber","2")
-        utils.add_jdl_general_attribute("WholeNodes","true")
-        utils.add_jdl_general_attribute("SMPGranularity","2")
-        utils.add_jdl_general_attribute("Hostnumber","1")
-
-        check=['CpuNumber = 2','WholeNodes = true','SMPGranularity = 2','Hostnumber = 1']
-
-        errors=[]
-
-        utils.info("Submit MPI job")
-
-        JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-        utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
-    
-        utils.info("Wait until job transefered to CREAM CE")
-
-        utils.wait_until_job_transfered(JOBID)
-    
-        cream_jobid=utils.get_cream_jobid(JOBID)
-
-        utils.info("Get the resulting cream jdl")
-
-        cream_jdl=utils.get_cream_jdl(cream_jobid)
-
-        utils.info("Check the cream jdl for the forwarding parameters")
-
-        for attribute in check:
-            if cream_jdl.find(attribute)==-1:
-                errors.append(attribute)
+    if len(names)==0:
+        names=["Submit to CREAM CE"]
+        ces=["/cream-"]
 
 
-        if len(errors)>0:
-            msg=' , '.join(errors)
-            utils.error("Problem with the following parameters: %s"%(msg))
+    for i in range(len(names)):
+
+        try:
+
+            utils.show_progress("%s  Case 1 - %s"%(title,names[i]))
+            utils.info("\t%s Case 1 - %s"%(title,names[i]))
+
+            Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),ces[i])
+
+            utils.change_jdl_attribute("CpuNumber","2")
+            utils.add_jdl_general_attribute("WholeNodes","true")
+            utils.add_jdl_general_attribute("SMPGranularity","2")
+            utils.add_jdl_general_attribute("Hostnumber","1")
+
+            check=['CpuNumber = 2','WholeNodes = true','SMPGranularity = 2','Hostnumber = 1']
+
+            errors=[]
+
+            utils.info("Submit MPI job")
+
+            JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
+
+            utils.info("Wait until job transefered to CE")
+
+            utils.wait_until_job_transfered(JOBID)
+
+            cream_jobid=utils.get_cream_jobid(JOBID)
+
+            utils.info("Get the resulting cream jdl")
+
+            cream_jdl=utils.get_cream_jdl(cream_jobid)
+
+            utils.info("Check the cream jdl for the forwarding parameters")
+
+            for attribute in check:
+                if cream_jdl.find(attribute)==-1:
+                    errors.append(attribute)
+
+
+            if len(errors)>0:
+                msg=' , '.join(errors)
+                utils.error("Problem with the following parameters: %s"%(msg))
+                fails=fails+1
+
+
+            utils.show_progress("%s Case 2 - %s"%(title,names[i]))
+            utils.info("\t%s Case 2 - %s"%(title,names[i]))
+
+            Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),ces[i])
+
+            utils.change_jdl_attribute("CpuNumber","1")
+            utils.add_jdl_general_attribute("WholeNodes","true")
+            utils.add_jdl_general_attribute("SMPGranularity","2")
+
+            check=['CpuNumber = 1','WholeNodes = true','SMPGranularity = 2']
+
+            errors=[]
+
+            utils.info("Submit MPI job")
+
+            JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
+
+            utils.info("Wait until job transefered to CREAM CE")
+
+            utils.wait_until_job_transfered(JOBID)
+
+            cream_jobid=utils.get_cream_jobid(JOBID)
+
+            utils.info("Get the resulting cream jdl")
+
+            cream_jdl=utils.get_cream_jdl(cream_jobid)
+
+            utils.info("Check the cream jdl for the forwarding parameters")
+
+            for attribute in check:
+                if cream_jdl.find(attribute)==-1:
+                    errors.append(attribute)
+
+
+            if len(errors)>0:
+                msg=' , '.join(errors)
+                utils.error("Problem with the following parameters: %s"%(msg))
+                fails=fails+1
+
+            utils.show_progress("%s Case 3  - %s"%(title,names[i]))
+            utils.info("\t%s Case 3 - %s"%(title,names[i]))
+
+            Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),ces[i])
+
+            utils.change_jdl_attribute("CpuNumber","3")
+            utils.add_jdl_general_attribute("WholeNodes","false")
+            utils.add_jdl_general_attribute("SMPGranularity","3")
+            utils.add_jdl_general_attribute("Hostnumber","1")
+
+            utils.info("Submit MPI job")
+
+            message=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1)
+
+            utils.info("Check the error message")
+
+            if message.find("SMPGranularity and HostNumber are mutually exclusive when WholeNodes allocation is not requested: wrong combination of values")==-1:
+               utils.error("Job failed reason: %s. Expected reason: SMPGranularity and HostNumber are mutually exclusive when WholeNodes allocation is not requested: wrong combination of values"%(message))
+               fails=fails+1
+
+
+            utils.show_progress("%s Case 4 - %s"%(title,names[i]))
+            utils.info("\t%s Case 4 - %s"%(title,names[i]))
+
+            Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),ces[i])
+
+            utils.change_jdl_attribute("CpuNumber","3")
+            utils.add_jdl_general_attribute("WholeNodes","false")
+            utils.add_jdl_general_attribute("SMPGranularity","3")
+
+            check=['CpuNumber = 3','WholeNodes = false','SMPGranularity = 3']
+
+            errors=[]
+
+            utils.info("Submit MPI job")
+
+            JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
+
+            utils.info("Wait until job transefered to CREAM CE")
+
+            utils.wait_until_job_transfered(JOBID)
+
+            cream_jobid=utils.get_cream_jobid(JOBID)
+
+            utils.info("Get the resulting cream jdl")
+
+            cream_jdl=utils.get_cream_jdl(cream_jobid)
+
+            utils.info("Check the cream jdl for the forwarding parameters")
+
+            for attribute in check:
+                if cream_jdl.find(attribute)==-1:
+                    errors.append(attribute)
+
+
+            if len(errors)>0:
+                msg=' , '.join(errors)
+                utils.error("Problem with the following parameters: %s"%(msg))
+                fails=fails+1
+
+
+            utils.show_progress("%s Case 5 - %s"%(title,names[i]))
+            utils.info("\t%s Case 5 - %s"%(title,names[i]))
+
+            Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),ces[i])
+            utils.change_jdl_attribute("CpuNumber","8")
+            utils.add_jdl_general_attribute("WholeNodes","true")
+            utils.add_jdl_general_attribute("SMPGranularity","8")
+            utils.add_jdl_general_attribute("Hostnumber","2")
+
+            check=['CpuNumber = 8','WholeNodes = true','SMPGranularity = 8','Hostnumber = 2']
+
+            errors=[]
+
+            utils.info("Submit MPI job")
+
+            JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
+
+            utils.info("Wait until job transefered to CREAM CE")
+
+            utils.wait_until_job_transfered(JOBID)
+
+            cream_jobid=utils.get_cream_jobid(JOBID)
+
+            utils.info("Get the resulting cream jdl")
+
+            cream_jdl=utils.get_cream_jdl(cream_jobid)
+
+            utils.info("Check the cream jdl for the forwarding parameters")
+
+            for attribute in check:
+                if cream_jdl.find(attribute)==-1:
+                    errors.append(attribute)
+
+
+            if len(errors)>0:
+                msg=' , '.join(errors)
+                utils.error("Problem with the following parameters: %s"%(msg))
+                fails=fails+1
+
+        except (GeneralError,RunCommandError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
             fails=fails+1
 
-
-        utils.show_progress("Test 8: Case 2")
-        utils.info("\tTest 8: Case 2")
-
-        Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"/cream-")
-
-        utils.change_jdl_attribute("CpuNumber","1")
-        utils.add_jdl_general_attribute("WholeNodes","true")
-        utils.add_jdl_general_attribute("SMPGranularity","2")
-
-        check=['CpuNumber = 1','WholeNodes = true','SMPGranularity = 2']
-
-        errors=[]
-
-        utils.info("Submit MPI job")
-
-        JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-        utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
-
-        utils.info("Wait until job transefered to CREAM CE")
-
-        utils.wait_until_job_transfered(JOBID)
-
-        cream_jobid=utils.get_cream_jobid(JOBID)
-
-        utils.info("Get the resulting cream jdl")
-
-        cream_jdl=utils.get_cream_jdl(cream_jobid)
-
-        utils.info("Check the cream jdl for the forwarding parameters")
-
-        for attribute in check:
-            if cream_jdl.find(attribute)==-1:
-                errors.append(attribute)
-
-
-        if len(errors)>0:
-            msg=' , '.join(errors)
-            utils.error("Problem with the following parameters: %s"%(msg))
-            fails=fails+1
-        
-
-        utils.show_progress("Test 8: Case 3")
-        utils.info("\tTest 8: Case 3")
-
-        Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"/cream-")
-
-        utils.change_jdl_attribute("CpuNumber","3")
-        utils.add_jdl_general_attribute("WholeNodes","false")
-        utils.add_jdl_general_attribute("SMPGranularity","3")
-        utils.add_jdl_general_attribute("Hostnumber","1")
-
-        utils.info("Submit MPI job")
-
-        message=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1)
-
-        utils.info("Check the error message")
-
-        if message.find("SMPGranularity and HostNumber are mutually exclusive when WholeNodes allocation is not requested: wrong combination of values")==-1:
-           utils.error("Job failed reason: %s. Expected reason: SMPGranularity and HostNumber are mutually exclusive when WholeNodes allocation is not requested: wrong combination of values"%(message))
-           fails=fails+1
-
-
-        utils.show_progress("Test 8: Case 4")
-        utils.info("\tTest 8: Case 4")
-
-        Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"/cream-")
-
-        utils.change_jdl_attribute("CpuNumber","3")
-        utils.add_jdl_general_attribute("WholeNodes","false")
-        utils.add_jdl_general_attribute("SMPGranularity","3")
-
-        check=['CpuNumber = 3','WholeNodes = false','SMPGranularity = 3']
-
-        errors=[]
-
-        utils.info("Submit MPI job")
-
-        JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-        utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
-
-        utils.info("Wait until job transefered to CREAM CE")
-
-        utils.wait_until_job_transfered(JOBID)
-
-        cream_jobid=utils.get_cream_jobid(JOBID)
-
-        utils.info("Get the resulting cream jdl")
-
-        cream_jdl=utils.get_cream_jdl(cream_jobid)
-
-        utils.info("Check the cream jdl for the forwarding parameters")
-
-        for attribute in check:
-            if cream_jdl.find(attribute)==-1:
-                errors.append(attribute)
-
-
-        if len(errors)>0:
-            msg=' , '.join(errors)
-            utils.error("Problem with the following parameters: %s"%(msg))
-            fails=fails+1
-
-
-        utils.show_progress("Test 8: Case 5")
-        utils.info("\tTest 8: Case 5")
-
-        Job_utils.prepare_mpi_job(utils,utils.get_jdl_file(),"/cream-")
-        utils.change_jdl_attribute("CpuNumber","8")
-        utils.add_jdl_general_attribute("WholeNodes","true")
-        utils.add_jdl_general_attribute("SMPGranularity","8")
-        utils.add_jdl_general_attribute("Hostnumber","2")
-        
-        check=['CpuNumber = 8','WholeNodes = true','SMPGranularity = 8','Hostnumber = 2']
-
-        errors=[]
-
-        utils.info("Submit MPI job")
-
-        JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-        utils.info("Job submitted successfuly. Returned JOBID: %s"%(JOBID))
-
-        utils.info("Wait until job transefered to CREAM CE")
-
-        utils.wait_until_job_transfered(JOBID)
-
-        cream_jobid=utils.get_cream_jobid(JOBID)
-
-        utils.info("Get the resulting cream jdl")
-
-        cream_jdl=utils.get_cream_jdl(cream_jobid)
-
-        utils.info("Check the cream jdl for the forwarding parameters")
-
-        for attribute in check:
-            if cream_jdl.find(attribute)==-1:
-                errors.append(attribute)
-
-
-        if len(errors)>0:
-            msg=' , '.join(errors)
-            utils.error("Problem with the following parameters: %s"%(msg))
-            fails=fails+1
-
-    except (GeneralError,RunCommandError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return fails
 
     return fails
 
-
-def check_jdls_normal_job(utils, title):
-
-    fails=0
-
-     
-
-
+    
 
 def main():
     	
     utils = Test_utils.Test_utils(sys.argv[0],"Test a complete job cycle: from submission to get output")
 
-    tests=["Set 1: Submit a normal job (3 cases LCG-CE, CREAM, general)"]
-    tests.append("Set 2: Submit a bulk of jobs (3 cases LCG-CE, CREAM, general)")
-    tests.append("Set 3: Submit a parametric job (3 cases LCG-CE, CREAM, general)")
+    tests=["Set 1: Submit a normal job"]
+    tests.append("Set 2: Submit a bulk of jobs")
+    tests.append("Set 3: Submit a parametric job")
     tests.append("Set 4: Submit a DAG job")
-    tests.append("Set 5: Submit a MPI job (3 cases LCG-CE, CREAM, general)")
-    tests.append("Set 6: Submit a perusal job (2 cases LCG-CE,CREAM)")
-    tests.append("Set 7: Submit a bulk of jobs (3 cases LCG-CE, CREAM, general) using a single jdl with al the jdls of nodes")
+    tests.append("Set 5: Submit a MPI job")
+    tests.append("Set 6: Submit a perusal job")
+    tests.append("Set 7: Submit a bulk of jobs using a single jdl with al the jdls of nodes")
     tests.append("Set 8: Testing forwarding parameters for parallel jobs")
-    tests.append("Set 9: Check different jdls cases for normal job ( submission to LCG-CE and CREAM)")
+    
 
     utils.prepare(sys.argv[1:],tests)
 
@@ -716,11 +605,6 @@ def main():
         if all_tests==1 or utils.check_test_enabled(8)==1 :
             if forward_parameters_parallel_jobs(utils, tests[7]):
                 fails.append(tests[7])
-
-        if all_tests==1 or utils.check_test_enabled(9)==1 :
-            if check_jdls_normal_job(utils, tests[8]):
-                fails.append(tests[8])
-
 
 
 

@@ -4,7 +4,6 @@ import sys
 import signal
 import os.path
 import traceback
-import commands
 import re
 
 from Exceptions import *
@@ -56,181 +55,242 @@ def check_epilogue(utils, prolog=0):
 
 def test1(utils, title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        utils.set_prologue_jdl(utils.get_jdl_file())
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        JOBID = utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+    for i in range(len(names)):
 
-        utils.wait_until_job_finishes(JOBID)
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        utils.job_status(JOBID)
+        utils.info("%s - %s"%(title,names[i]))
 
-        if utils.get_job_status().find("Done (Success)")==-1:
-            utils.error("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(utils.get_job_status()))
+        try:
 
-        else:
+            utils.set_prologue_jdl(utils.get_jdl_file())
 
-            utils.dbg("Retrieve the output")
-            utils.run_command_continue_on_error ("glite-wms-job-output --dir %s --noint --nosubdir %s"%(utils.get_job_output_dir(),JOBID))
-            utils.info("Check if the output files are correctly retrieved")
+            if len(ces[i])>0:
+                utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
+            else:
+                utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-            if( os.path.isfile("%s/prologue.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) ):
+            JOBID = utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
-                utils.info("All output files are retrieved")
+            utils.wait_until_job_finishes(JOBID)
 
-                # Check prologue output
-                check_prologue(utils)
+            utils.job_status(JOBID)
 
-                # Check executable output
-                check_stdout(utils,1)
-
-                utils.dbg("Output files are as expected")
+            if utils.get_job_status().find("Done (Success)")==-1:
+                utils.error("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(utils.get_job_status()))
 
             else:
-                utils.error("TEST FAILS. Output files are not retrieved")
-                raise GeneralError("Check the output files","Output files are not retrieved")
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return 1
+                utils.dbg("Retrieve the output")
+                utils.run_command_continue_on_error ("glite-wms-job-output --dir %s --noint --nosubdir %s"%(utils.get_job_output_dir(),JOBID))
+                utils.info("Check if the output files are correctly retrieved")
 
-    ## remove used files
-    utils.remove("%s/prologue.sh"%(utils.get_tmp_dir()))
-    utils.remove("%s/exe.sh"%(utils.get_tmp_dir()))
-    os.system("rm -rf %s/*"%(utils.get_job_output_dir()))
+                if( os.path.isfile("%s/prologue.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) ):
 
-    return 0
+                    utils.info("All output files are retrieved")
+
+                    # Check prologue output
+                    check_prologue(utils)
+
+                    # Check executable output
+                    check_stdout(utils,1)
+
+                    utils.dbg("Output files are as expected")
+
+                    ## remove used files
+                    utils.remove("%s/prologue.sh"%(utils.get_tmp_dir()))
+                    utils.remove("%s/exe.sh"%(utils.get_tmp_dir()))
+                    os.system("rm -rf %s/*"%(utils.get_job_output_dir()))
+
+                else:
+                    utils.error("TEST FAILS. Output files are not retrieved")
+                    raise GeneralError("Check the output files","Output files are not retrieved")
+
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
+
+    
+    if fails==0:
+      return 0
+    else:
+      return 1
 
 
 
 def test2(utils, title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        utils.set_epilogue_jdl(utils.get_jdl_file())
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        JOBID = utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+    for i in range(len(names)):
 
-        utils.wait_until_job_finishes(JOBID)
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        utils.job_status(JOBID)
+        utils.info("%s - %s"%(title,names[i]))
 
-        if utils.get_job_status().find("Done (Success)")==-1:
 
-            utils.error("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(utils.get_job_status()))
+        try:
 
-        else:
+            utils.set_epilogue_jdl(utils.get_jdl_file())
 
-            utils.info ("Retrieve the output")
-            utils.run_command_continue_on_error ("glite-wms-job-output --dir %s --noint --nosubdir %s"%(utils.get_job_output_dir(),JOBID))
-            utils.dbg ("Check if the output files are correctly retrieved")
+            if len(ces[i])>0:
+                utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
+            else:
+                utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-            if( os.path.isfile("%s/epilogue.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.out"%(utils.get_job_output_dir()))) :
+            JOBID = utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
-                utils.info ("All output files are retrieved")
+            utils.wait_until_job_finishes(JOBID)
 
-                # Check executable output
-                check_stdout(utils)
+            utils.job_status(JOBID)
 
-                # Check epilogue output
-                check_epilogue(utils)
+            if utils.get_job_status().find("Done (Success)")==-1:
 
-                utils.dbg("Output files are as expected")
+                utils.error("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(utils.get_job_status()))
 
             else:
-                utils.error("TEST FAILS. Output files are not retrieved")
-                raise GeneralError("Check the output files","Output files are not retrieved")
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
+                utils.info ("Retrieve the output")
+                utils.run_command_continue_on_error ("glite-wms-job-output --dir %s --noint --nosubdir %s"%(utils.get_job_output_dir(),JOBID))
+                utils.dbg ("Check if the output files are correctly retrieved")
+
+                if( os.path.isfile("%s/epilogue.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.out"%(utils.get_job_output_dir()))) :
+
+                    utils.info ("All output files are retrieved")
+
+                    # Check executable output
+                    check_stdout(utils)
+
+                    # Check epilogue output
+                    check_epilogue(utils)
+
+                    utils.dbg("Output files are as expected")
+
+                    ## remove used files
+                    utils.remove("%s/epilogue.sh"%(utils.get_tmp_dir()))
+                    utils.remove("%s/exe.sh"%(utils.get_tmp_dir()))
+                    os.system("rm -rf %s/*"%(utils.get_job_output_dir()))
+
+                else:
+                    utils.error("TEST FAILS. Output files are not retrieved")
+                    raise GeneralError("Check the output files","Output files are not retrieved")
+
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
+
+
+    if fails==0:
+        return 0
+    else:
         return 1
 
-    ## remove used files
-    utils.remove("%s/epilogue.sh"%(utils.get_tmp_dir()))
-    utils.remove("%s/exe.sh"%(utils.get_tmp_dir()))
-    os.system("rm -rf %s/*"%(utils.get_job_output_dir()))
-
-    return 0
 
 
 def test3(utils, title):
 
+    names,ces=utils.get_target_ces()
 
-    utils.show_progress(title)
-    utils.info(title)
+    fails=0
 
-    try:
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        utils.set_prologue_epilogue_jdl(utils.get_jdl_file())
+    for i in range(len(names)):
 
-        JOBID = utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        utils.wait_until_job_finishes(JOBID)
+        utils.info("%s - %s"%(title,names[i]))
 
-        utils.job_status(JOBID)
+        try:
 
-        if utils.get_job_status().find("Done (Success)")==-1:
+            utils.set_prologue_epilogue_jdl(utils.get_jdl_file())
 
-            utils.error("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(utils.get_job_status()))
+            if len(ces[i])>0:
+                utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
+            else:
+                utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-        else:
-    
-            utils.dbg ("Retrieve the output")
-            utils.run_command ("glite-wms-job-output --dir %s --noint --nosubdir %s"%(utils.get_job_output_dir(),JOBID))
-            utils.info ("Check if the output files are correctly retrieved")
+            JOBID = utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
-            if( os.path.isfile("%s/prologue.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/epilogue.out"%(utils.get_job_output_dir()))):
+            utils.wait_until_job_finishes(JOBID)
 
-                utils.info("All output files are retrieved")
+            utils.job_status(JOBID)
 
-                # Check prologue output
-                check_prologue(utils)
+            if utils.get_job_status().find("Done (Success)")==-1:
 
-                # Check executable output
-                check_stdout(utils,1)
-             
-                # Check epilogue output
-                check_epilogue(utils,1)             
-
-                utils.dbg ("Output files are as expected")
+                utils.error("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(utils.get_job_status()))
 
             else:
-                utils.error("TEST FAILS. Output files are not retrieved")
-                raise GeneralError("Check the output files","Output files are not retrieved")
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return 1
+                utils.dbg ("Retrieve the output")
+                utils.run_command ("glite-wms-job-output --dir %s --noint --nosubdir %s"%(utils.get_job_output_dir(),JOBID))
+                utils.info ("Check if the output files are correctly retrieved")
 
-    ## remove used files
-    utils.remove("%s/prologue.sh"%(utils.get_tmp_dir()))
-    utils.remove("%s/exe.sh"%(utils.get_tmp_dir()))
-    utils.remove("%s/epilogue.sh"%(utils.get_tmp_dir()))
-    os.system("rm -rf %s"%(utils.get_job_output_dir()))
+                if( os.path.isfile("%s/prologue.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/epilogue.out"%(utils.get_job_output_dir()))):
+
+                    utils.info("All output files are retrieved")
+
+                    # Check prologue output
+                    check_prologue(utils)
+
+                    # Check executable output
+                    check_stdout(utils,1)
+
+                    # Check epilogue output
+                    check_epilogue(utils,1)
+
+                    utils.dbg ("Output files are as expected")
+
+                    ## remove used files
+                    utils.remove("%s/prologue.sh"%(utils.get_tmp_dir()))
+                    utils.remove("%s/exe.sh"%(utils.get_tmp_dir()))
+                    utils.remove("%s/epilogue.sh"%(utils.get_tmp_dir()))
+                    os.system("rm -rf %s"%(utils.get_job_output_dir()))
+
+                else:
+                    utils.error("TEST FAILS. Output files are not retrieved")
+                    raise GeneralError("Check the output files","Output files are not retrieved")
+
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
+
    
-    return 0
+    if fails==0:
+        return 0
+    else:
+        return 1
 
 
 

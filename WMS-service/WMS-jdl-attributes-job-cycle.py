@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python
 
 import sys
 import signal
@@ -276,174 +276,190 @@ def set_OSBDest(utils,filename):
 
 def test1(utils,title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        set_allowzipped_jdl(utils,utils.get_jdl_file())
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        utils.info("Submit job")
+    for i in range(len(names)):
 
-        output=utils.run_command_continue_on_error("glite-wms-job-submit %s --debug -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        messages=['File archiving and file compression allowed by user in the JDL']
-        messages.append('Archiving the ISB files')
-        messages.append('ISB ZIPPED file successfully created')
+        utils.info("%s - %s"%(title,names[i]))
 
-        utils.info("Check debug output for expected messages")
+        try:
 
-        for message in messages:
+            set_allowzipped_jdl(utils,utils.get_jdl_file())
 
-            utils.info("Check for message: %s"%(messages))
-
-            if output.find(message)==-1:
-                utils.error("Message %s not found"%(message))
-                return 1
+            if len(ces[i])>0:
+                 utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
             else:
-                utils.info("Message found")
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-        JOBID=''
-        ZippedISB=''
+            utils.info("Submit job")
 
-        for line in output.split("\n"):
-            if line.find("ISB ZIPPED file successfully created:")!=-1:
-              ZippedISB=line.split('/tmp/')[1].strip(' \n')
+            output=utils.run_command_continue_on_error("glite-wms-job-submit %s --debug -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
-            if line.find("The JobId is:")!=-1:
-              JOBID=line.split('The JobId is:')[1].strip(' \n')
+            messages=['File archiving and file compression allowed by user in the JDL']
+            messages.append('Archiving the ISB files')
+            messages.append('ISB ZIPPED file successfully created')
 
-        utils.info("Check if AllowZippedISB Attribute is added:")
+            utils.info("Check debug output for expected messages")
 
-        output=utils.run_command_continue_on_error("glite-wms-job-info --jdl %s"%(JOBID))
+            for message in messages:
 
-        if output.find("AllowZippedISB = true;")!=-1:
-            utils.info("Attribute AllowZippedISB successfully added to the jdl")
-        else:
-            utils.error("Attribute AllowZippedISB not added to the jdl")
-            return 1
+                utils.info("Check for message: %s"%(messages))
 
-        utils.info("Check if ZippedISB Attribute is added:")
+                if output.find(message)==-1:
+                    utils.error("Message %s not found"%(message))
+                    raise GeneralError("Check for message: %s"%(messages),"Message %s not found"%(message))
+                else:
+                    utils.info("Message found")
 
-        if output.find("ZippedISB = { \"%s\" };"%(ZippedISB))!=-1:
-            utils.info("Attribute ZippedISB successfully added to the jdl")
-        else:
-            utils.error("Unable to find ZippedISB={\"%s\"} to the jdl"%(ZippedISB))
-            return 1
+            JOBID=''
+            ZippedISB=''
 
-        utils.info("Wait until job finishes")
+            for line in output.split("\n"):
+                if line.find("ISB ZIPPED file successfully created:")!=-1:
+                  ZippedISB=line.split('/tmp/')[1].strip(' \n')
 
-        utils.wait_until_job_finishes(JOBID)
+                if line.find("The JobId is:")!=-1:
+                  JOBID=line.split('The JobId is:')[1].strip(' \n')
 
-        utils.info("Try to get the job output")
+            utils.info("Check if AllowZippedISB Attribute is added:")
 
-        utils.job_status(JOBID)
+            output=utils.run_command_continue_on_error("glite-wms-job-info --jdl %s"%(JOBID))
 
-        files=['fileA','fileB','fileC','fileD']
+            if output.find("AllowZippedISB = true;")!=-1:
+                utils.info("Attribute AllowZippedISB successfully added to the jdl")
+            else:
+                utils.error("Attribute AllowZippedISB not added to the jdl")
+                raise GeneralError("Check if AllowZippedISB Attribute is added","Attribute AllowZippedISB not added to the jdl")
 
-        if utils.get_job_status().find("Done") != -1 :
+            utils.info("Check if ZippedISB Attribute is added:")
 
-            utils.remove(utils.get_tmp_file())
+            if output.find("ZippedISB = { \"%s\" };"%(ZippedISB))!=-1:
+                utils.info("Attribute ZippedISB successfully added to the jdl")
+            else:
+                utils.error("Unable to find ZippedISB={\"%s\"} to the jdl"%(ZippedISB))
+                raise GeneralError("Check if ZippedISB Attribute is added","Unable to find ZippedISB={\"%s\"} to the jdl"%(ZippedISB))
 
-            utils.info("Retrieve the output")
+            utils.info("Wait until job finishes")
 
-            utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+            utils.wait_until_job_finishes(JOBID)
 
-            utils.info("Check if output files are correctly retrieved")
+            utils.info("Try to get the job output")
 
-            if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+            utils.job_status(JOBID)
 
-                utils.info("Output files are correctly retrieved")
+            files=['fileA','fileB','fileC','fileD']
 
-                utils.info("Check std output to see if all the files are transferred to the CE")
+            if utils.get_job_status().find("Done") != -1 :
 
-                output=utils.run_command_continue_on_error("cat %s/std.out"%(utils.get_job_output_dir()))
+                utils.remove(utils.get_tmp_file())
 
-                for file in files:
+                utils.info("Retrieve the output")
 
-                  utils.info("Check for file %s to std.out"%(file))
+                utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
 
-                  if output.find(file)==-1:
-                       utils.error("File %s is not transferred to the CE"%(file))
-                       return 1
-                  else:
-                       utils.info("File %s is successfully transferred to the CE"%(file))
-                return 0
+                utils.info("Check if output files are correctly retrieved")
+
+                if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+
+                    utils.info("Output files are correctly retrieved")
+
+                    utils.info("Check std output to see if all the files are transferred to the CE")
+
+                    output=utils.run_command_continue_on_error("cat %s/std.out"%(utils.get_job_output_dir()))
+
+                    for file in files:
+
+                      utils.info("Check for file %s to std.out"%(file))
+
+                      if output.find(file)==-1:
+                           utils.error("File %s is not transferred to the CE"%(file))
+                           raise GeneralError("Check for file %s to std.out"%(file),"File %s is not transferred to the CE"%(file))
+                      else:
+                           utils.info("File %s is successfully transferred to the CE"%(file))
+                    
+                else:
+                    utils.error("Output files are not correctly retrieved")
+                    raise GeneralError("Check if output files are correctly retrieved","Output files are not correctly retrieved")
 
             else:
-                utils.error("Output files are not correctly retrieved")
-                return 1
+                utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                raise GeneralError("Try to get the job output","Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
 
-        else:
-            utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            return 1
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return 1
 
-    return 0
-
-    
+    return fails
+        
 
 def test2(utils,title):
 
+    
     utils.show_progress(title)
     utils.info(title)
 
     try:
 
-        utils.set_isb_jdl(utils.get_jdl_file())
-        utils.add_jdl_general_attribute("RetryCount",1)
+            utils.set_isb_jdl(utils.get_jdl_file())
+            utils.add_jdl_general_attribute("RetryCount",1)
 
-        # we need a jdl which doesn't match
-        utils.set_requirements ("false")
+            # we need a jdl which doesn't match
+            utils.set_requirements ("false")
 
-        #set expiry time 2 minutes from now
-        utils.add_jdl_general_attribute("ExpiryTime",int(time.time()+120))
+            #set expiry time 2 minutes from now
+            utils.add_jdl_general_attribute("ExpiryTime",int(time.time()+120))
 
-        utils.info("Submit job")
+            utils.info("Submit job")
 
-        JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --nomsg --config %s  %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+            JOBID=utils.run_command_continue_on_error ("glite-wms-job-submit %s --nomsg --config %s  %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
-        utils.info("Wait until job finishes")
+            utils.info("Wait until job finishes")
 
-        utils.wait_until_job_finishes(JOBID)
+            utils.wait_until_job_finishes(JOBID)
 
-        utils.info("Check job's final status")
+            utils.info("Check job's final status")
 
-        utils.job_status(JOBID)
+            utils.job_status(JOBID)
 
-        if utils.get_job_status().find("Aborted")!=-1:
+            if utils.get_job_status().find("Aborted")!=-1:
 
-            utils.info("Job's final status is Aborted as expected")
+                utils.info("Job's final status is Aborted as expected")
 
-            utils.info("Check failed reason")
+                utils.info("Check failed reason")
 
-            if utils.get_job_status_reason(JOBID).find("request expired")!=-1:
-                utils.info("Aborted reason is 'request expired' as expected")
-                return 0
+                if utils.get_job_status_reason(JOBID).find("request expired")!=-1:
+                    utils.info("Aborted reason is 'request expired' as expected")
+                    return 0
+
+                else:
+                    utils.error("Error: Job's final status is aborted by failed reason is '%s' , while expected is 'request expired'"%(utils.get_job_status_reason(JOBID)))
+                    return 1
 
             else:
-                utils.error("Error: Job's final status is aborted by failed reason is '%s' , while expected is 'request expired'"%(utils.get_job_status_reason(JOBID)))
+                utils.error("Test Failed. Job's final status is not Aborted as expected , instead we get %s"%(utils.get_job_status()))
                 return 1
-
-        else:
-            utils.error("Test Failed. Job's final status is not Aborted as expected , instead we get %s"%(utils.get_job_status()))
-            return 1
 
 
     except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return 1
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            return 1
 
     return 0
 
@@ -451,95 +467,59 @@ def test2(utils,title):
 
 def test3(utils,title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        ###Create jdl with ShortDeadlineJob attribute enabled
-        utils.set_isb_jdl(utils.get_jdl_file())
-        utils.add_jdl_general_attribute("RetryCount",1)
-        utils.add_jdl_general_attribute("ShortDeadlineJob","true")
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        fails=0
+    for i in range(len(names)):
 
-        utils.show_progress("Case A: Submit to an LCG-CE")
-        utils.info("\tCase A: Submit to an LCG-CE")
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        utils.set_destination_ce(utils.get_jdl_file(),"2119/jobmanager")
+        utils.info("%s - %s"%(title,names[i]))
 
-        output=utils.run_command_continue_on_error("glite-wms-job-list-match %s -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+        try:
 
-        if output.find("No Computing Element matching your job requirements has been found!")!=-1:
-            utils.error("No Computing Element matching your job requirements has been found!")
-            fails=fails+1
-        else:
-            result=Job_utils.submit_normal_job(utils,"2119/jobmanager")
+            ###Create jdl with ShortDeadlineJob attribute enabled
+            utils.set_isb_jdl(utils.get_jdl_file())
+            utils.add_jdl_general_attribute("RetryCount",1)
+            utils.add_jdl_general_attribute("ShortDeadlineJob","true")
 
-            if result[0] == 1 :
-                utils.error(result[1])
-                fails=fails+1
+            if len(ces[i])>0:
+                 utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
             else:
-                utils.dbg("Clean job output directory")
-                os.system("rm -rf %s"%(utils.get_job_output_dir()))
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
 
+            output=utils.run_command_continue_on_error("glite-wms-job-list-match %s -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
-        utils.show_progress("Case B: Submit to a CREAM CE")
-        utils.info("\tCase B: Submit to a CREAM CE")
+            if output.find("No Computing Element matching your job requirements has been found!")!=-1:
 
-        utils.set_isb_jdl(utils.get_jdl_file())
-        utils.add_jdl_general_attribute("RetryCount",1)
-        utils.add_jdl_general_attribute("ShortDeadlineJob","true")
+                utils.error("No Computing Element matching your job requirements has been found!")
+                raise GeneralError("","No Computing Element matching your job requirements has been found!")
 
-        utils.set_destination_ce(utils.get_jdl_file(),"/cream-")
-
-        output=utils.run_command_continue_on_error("glite-wms-job-list-match %s -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-        if output.find("No Computing Element matching your job requirements has been found!")!=-1:
-            utils.error("No Computing Element matching your job requirements has been found!")
-            fails=fails+1
-        else:
-
-            result=Job_utils.submit_normal_job(utils,"/cream-")
-
-            if result[0] == 1 :
-                utils.error(result[1])
-                fails=fails+1
             else:
-                utils.dbg("Clean job output directory")
-                os.system("rm -rf %s"%(utils.get_job_output_dir()))
 
-        utils.show_progress("Case C: Submit without restrictions")
-        utils.info("\tCase C: Submit without restrictions")
+                result=Job_utils.submit_normal_job(utils,"")
 
-        utils.set_isb_jdl(utils.get_jdl_file())
-        utils.add_jdl_general_attribute("RetryCount",1)
-        utils.add_jdl_general_attribute("ShortDeadlineJob","true")
+                if result[0] == 1 :
+                    utils.error(result[1])
+                    raise GeneralError("Job Submission",result[1])
+                else:
+                    utils.dbg("Clean job output directory")
+                    os.system("rm -rf %s"%(utils.get_job_output_dir()))
 
-        output=utils.run_command_continue_on_error("glite-wms-job-list-match %s -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-        if output.find("No Computing Element matching your job requirements has been found!")!=-1:
-            utils.error("No Computing Element matching your job requirements has been found!")
+            
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
             fails=fails+1
-        else:
 
-            result=Job_utils.submit_normal_job(utils)
-
-            if result[0] == 1 :
-                utils.error(result[1])
-                fails=fails+1
-            else:
-                utils.dbg("Clean job output directory")
-                os.system("rm -rf %s"%(utils.get_job_output_dir()))
-
-
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return fails
 
     return fails
 
@@ -551,7 +531,10 @@ def datarequirements_test(utils,target,dir):
 
         set_jdl_data(utils,utils.get_jdl_file(),dir)
 
-        utils.set_destination_ce(utils.get_jdl_file(),target)
+        if utils.EXTERNAL_REQUIREMENTS==0:
+             utils.set_requirements("%s"%utils.DEFAULTREQ)
+        else:
+             utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
 
         utils.info("Check for matched CEs")
 
@@ -625,7 +608,7 @@ def test4(utils,title):
     fails=0
 
     try:
-
+        
             if utils.LFC=='' or utils.SE=='':
                 utils.warn("To run this test you have to set LFC and SE attributes at configuration file")
                 utils.show_progress("To run this test you have to set LFC and SE attributes at configuration file")
@@ -643,15 +626,17 @@ def test4(utils,title):
 
             utils.run_command_continue_on_error("lcg-cr --vo %s -d %s -l lfn:%s/file1.txt file://%s/file1.txt"%(utils.VO,utils.SE,dir,os.getcwd()))
 
-            target_ces=['/cream-','2119/jobmanager']
-            target_info=['Submit to CREAM CE','Submit to LCG CE']
+            target_info,target_ces=utils.get_target_ces()
 
-            
+            if len(target_info)==0:
+                target_info.append("Default Test - Submit to CREAM CE")
+                target_ces.append("/cream-")
+
             for target in target_ces:
 
-                utils.show_progress(target_info[target_ces.index(target)])
+                utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
 
-                utils.info("TEST CASE: %s"%(target_info[target_ces.index(target)]))
+                utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
 
                 utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
 
@@ -666,9 +651,10 @@ def test4(utils,title):
         utils.log_traceback("%s"%(utils.get_current_test()))
         utils.log_traceback(traceback.format_exc())
         fails=fails+1
-        return fails
         
+
     return fails
+        
 
 
 def isbbaseuri_test(utils,target_ce):
@@ -677,7 +663,10 @@ def isbbaseuri_test(utils,target_ce):
 
             set_ISBBase(utils,utils.get_jdl_file())
 
-            utils.set_destination_ce(utils.get_jdl_file(),target_ce)
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target_ce,utils.DEFAULTREQ))
 
             utils.info("Submit job")
 
@@ -755,16 +744,18 @@ def test5(utils,title):
         SSH_utils.execute_remote_cmd(ssh,"mkdir -p /tmp/%s/isb"%(utils.ID))
         SSH_utils.close_ssh(ssh)
 
-        target_ces=['/cream-','2119/jobmanager']
+        target_info,target_ces=utils.get_target_ces()
 
-        target_info=['Submit to CREAM CE','Submit to LCG CE']
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
 
 
         for target in target_ces:
 
-            utils.show_progress(target_info[target_ces.index(target)])
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
 
-            utils.info("TEST CASE: %s"%(target_info[target_ces.index(target)]))
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
 
             utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
 
@@ -792,7 +783,10 @@ def osbbasetdesturi_test(utils,target_ce,ssh):
 
             set_OSBBaseDest(utils,utils.get_jdl_file())
 
-            utils.set_destination_ce(utils.get_jdl_file(),target_ce)
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target_ce,utils.DEFAULTREQ))
 
             utils.info("Submit job")
 
@@ -884,18 +878,21 @@ def test6(utils,title):
             utils.show_progress("Please set the required variables for OSB node in test's configuration file")
             return 1
 
-        target_ces=['/cream-','2119/jobmanager']
-
-        target_info=['Submit to CREAM CE','Submit to LCG CE']
-
         ssh=SSH_utils.open_ssh(utils.OSB_DEST_HOSTNAME,utils.OSB_DEST_USERNAME,utils.OSB_DEST_PASSWORD)
         SSH_utils.execute_remote_cmd(ssh,"mkdir -p -m 0777 /tmp/%s/osbbase"%(utils.ID))
-        
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+
         for target in target_ces:
 
-            utils.show_progress(target_info[target_ces.index(target)])
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
 
-            utils.info("TEST CASE: %s"%(target_info[target_ces.index(target)]))
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
 
             utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
 
@@ -913,8 +910,7 @@ def test6(utils,title):
         utils.log_traceback(traceback.format_exc())
         fails=fails+1
 
-    SSH_utils.close_ssh(ssh)
-
+    
     return fails
 
 
@@ -926,7 +922,10 @@ def osbdesturi_test(utils,target_ce,ssh):
 
             set_OSBDest(utils,utils.get_jdl_file())
 
-            utils.set_destination_ce(utils.get_jdl_file(),target_ce)
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target_ce,utils.DEFAULTREQ))
 
             utils.info("Submit job")
 
@@ -1026,24 +1025,26 @@ def test7(utils,title):
             utils.show_progress("Please set the required variables for OSB node in test's configuration file")
             return 1
 
-        target_ces=['/cream-','2119/jobmanager']
-
-        target_info=['Submit to CREAM CE','Submit to LCG CE']
-
         ssh=SSH_utils.open_ssh(utils.OSB_DEST_HOSTNAME,utils.OSB_DEST_USERNAME,utils.OSB_DEST_PASSWORD)
         SSH_utils.execute_remote_cmd(ssh,"mkdir -p -m 0777 /tmp/%s/osbdest"%(utils.ID))
 
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+
         for target in target_ces:
 
-            utils.show_progress(target_info[target_ces.index(target)])
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
 
-            utils.info("TEST CASE: %s"%(target_info[target_ces.index(target)]))
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
 
             utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
 
             if osbdesturi_test(utils,target,ssh)==1:
                     fails=fails+1
-
 
         SSH_utils.close_ssh(ssh)
 
@@ -1062,31 +1063,6 @@ def test7(utils,title):
 
 
 
-def test8(utils,title):
-
-
-    utils.show_progress(title)
-    utils.info(title)
-
-    try:
-
-
-        utils.info("TEST PASS.")
-
-
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        return 1
-
-    return 0
-
-
-
-
 def main():
     	
     utils = Test_utils.Test_utils(sys.argv[0],"Test a complete job cycle for normal job with non default jdl files")
@@ -1098,7 +1074,7 @@ def main():
     tests.append("Test 5: Jdl with InputSandboxBaseURI")
     tests.append("Test 6: Jdl with OutputSandboxBaseDestURI")
     tests.append("Test 7: Jdl with OutputSandboxDestURI")
-    #tests.append("Test 8: Jdl with OutputData")
+
     
     
     utils.prepare(sys.argv[1:],tests)
@@ -1140,11 +1116,6 @@ def main():
          if test7(utils, tests[6]):
                fails.append(tests[6])
 
-    """
-    if all_tests==1 or utils.check_test_enabled(8)==1 :
-         if test8(utils, tests[7]):
-              fails.append(tests[7])
-    """
     
     if len(fails) > 0 :
       utils.exit_failure("%s test(s) fail(s): %s"%(len(fails), fails))

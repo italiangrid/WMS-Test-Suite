@@ -12,93 +12,132 @@ import Test_utils
 # raise GeneralError if fails
 def test1(utils, title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        utils.set_shallow_jdl(utils.get_jdl_file())
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+    for i in range(len(names)):
 
-        utils.wait_until_job_finishes(JOBID)
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        utils.job_status(JOBID)
+        utils.info("%s - %s"%(title,names[i]))
 
-        if utils.get_job_status().find("Aborted")==-1:
 
-            utils.error("TEST FAILS. Something goes wrong: job final status is %s"%(utils.get_job_status()))
-            raise GeneralError("Check if job's status is Aborted","Something goes wrong: job final status is %s"%(utils.get_job_status()))
+        try:
 
-        else:
+            utils.set_shallow_jdl(utils.get_jdl_file())
 
-            OUTPUT=utils.run_command_continue_on_error("glite-wms-job-logging-info --event RESUBMISSION %s"%(JOBID))
+            if len(ces[i])>0:
+                utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
+            else:
+                utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-            if OUTPUT.count("SHALLOW")!=2:
-                utils.error("TEST FAILS. Job %s hasn't be correctly resubmitted"%(JOBID))
-                raise GeneralError("Check the number of resubmissions","Job %s hasn't be correctly resubmitted"%(JOBID))
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.wait_until_job_finishes(JOBID)
+
+            utils.job_status(JOBID)
+
+            if utils.get_job_status().find("Aborted")==-1:
+
+                utils.error("TEST FAILS. Something goes wrong: job final status is %s"%(utils.get_job_status()))
+                raise GeneralError("Check if job's status is Aborted","Something goes wrong: job final status is %s"%(utils.get_job_status()))
 
             else:
-                utils.info("TEST PASS")
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
+                OUTPUT=utils.run_command_continue_on_error("glite-wms-job-logging-info --event RESUBMISSION %s"%(JOBID))
+
+                if OUTPUT.count("SHALLOW")!=2:
+                    utils.error("TEST FAILS. Job %s hasn't be correctly resubmitted"%(JOBID))
+                    raise GeneralError("Check the number of resubmissions","Job %s hasn't be correctly resubmitted"%(JOBID))
+
+                else:
+                    utils.info("TEST PASS")
+
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
+
+    if fails==0:
+        return 0
+    else:
         return 1
 
-    return 0
 
     
 def test2(utils, title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        utils.set_deep_jdl(utils.get_jdl_file())
+    if len(names)==0:
+        names.append("Default Test")
+        ces.append("")
 
-        JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+    for i in range(len(names)):
 
-        utils.wait_until_job_finishes(JOBID)
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        if utils.get_job_status().find("Aborted") == -1:
+        utils.info("%s - %s"%(title,names[i]))
 
-            utils.error("TEST FAILS. Something goes wrong: job final status is %s"%(utils.get_job_status()))
-            raise GeneralError("Check if job's status is Aborted","Something goes wrong: job final status is %s"%(utils.get_job_status()))
+        try:
 
-        else: # job is aborted
+            utils.set_deep_jdl(utils.get_jdl_file())
 
-            utils.dbg("Check the aborted reasons")
-            OUTPUT=utils.run_command_continue_on_error("glite-wms-job-status %s"%(JOBID))
-            
-            if OUTPUT.find("Cannot take token") != -1:
-                utils.error("TEST FAILS. Probably the token for job %s has not been recreated in WMS. Check it."%(JOBID))
-                raise GeneralError("Detect error message: Cannot take token","Probably the token for job %s has not been recreated in WMS."%(JOBID))  
-            
-            for line in OUTPUT.splitlines():
-                if line.split(":")[0].strip()=="Status Reason":
-                    reason=line.split(":")[1].strip()
-                    break
-            
-            if reason != "hit job retry count (2)":
-                utils.warn("Job aborted for un unexpected reason: %s"%(reason))
+            if len(ces[i])>0:
+                 utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
             else:
-                utils.info("TEST PASS.")
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.wait_until_job_finishes(JOBID)
+
+            if utils.get_job_status().find("Aborted") == -1:
+
+                utils.error("TEST FAILS. Something goes wrong: job final status is %s"%(utils.get_job_status()))
+                raise GeneralError("Check if job's status is Aborted","Something goes wrong: job final status is %s"%(utils.get_job_status()))
+
+            else: # job is aborted
+
+                utils.dbg("Check the aborted reasons")
+                OUTPUT=utils.run_command_continue_on_error("glite-wms-job-status %s"%(JOBID))
+
+                if OUTPUT.find("Cannot take token") != -1:
+                    utils.error("TEST FAILS. Probably the token for job %s has not been recreated in WMS. Check it."%(JOBID))
+                    raise GeneralError("Detect error message: Cannot take token","Probably the token for job %s has not been recreated in WMS."%(JOBID))
+
+                for line in OUTPUT.splitlines():
+                    if line.split(":")[0].strip()=="Status Reason":
+                        reason=line.split(":")[1].strip()
+                        break
+
+                if reason != "hit job retry count (2)":
+                    utils.warn("Job aborted for un unexpected reason: %s"%(reason))
+                else:
+                    utils.info("TEST PASS.")
+
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            fails=fails+1
+
+    if fails==0:
+        return 0
+    else:
         return 1
-
-    return 0
-
 
 
 def main():

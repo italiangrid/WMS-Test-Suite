@@ -29,7 +29,7 @@ def set_huge_jdl(utils,filename):
 
 
     
-def set_test3_jdl(utils,filename):
+def set_test2_jdl(utils,filename):
 
         FILE = open("%s/test.sh"%(utils.get_tmp_dir()),"w")
         FILE.write("#!/bin/sh\n")
@@ -60,108 +60,119 @@ def set_test3_jdl(utils,filename):
 
 def test1(utils, title):
 
-    utils.show_progress(title)
-    utils.info(title)
+    names,ces=utils.get_target_ces()
 
-    try:
+    fails=0
 
-        utils.info("Set MaxOuputSandboxSize=50M; to glite_wms.conf at WMS")
+    if len(names)==0:
+        names.append("Default Test , Submit to CREAM")
+        ces.append("")
 
-        ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
+    for i in range(len(names)):
 
-        SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['MaxOutputSandboxSize'],['*'],['50M'])
+        utils.show_progress("%s - %s"%(title,names[i]))
 
-        utils.info("Restart workload manager glite-wms-wm")
+        utils.info("%s - %s"%(title,names[i]))
 
-        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
+        try:
 
-        utils.info("Submit the job to LCG-CE and wait to finish")
+            utils.info("Set MaxOuputSandboxSize=50M; to glite_wms.conf at WMS")
 
-        set_huge_jdl(utils,utils.get_jdl_file())
-        utils.set_destination_ce(utils.get_jdl_file(),"2119/jobmanager")
+            ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
 
-        utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
+            SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['MaxOutputSandboxSize'],['*'],['50M'])
 
-        res=Job_utils.submit_only_normal_job(utils,"2119/jobmanager")
+            utils.info("Restart workload manager glite-wms-wm")
 
-        if res[0]==1:
-           utils.error("Matching CE is not LCG-CE")
-           raise GeneralError("Error matching CE","Matching CE is not LCG-CE")
-        else:
-           JOBID=res[1]
+            SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
 
-        utils.info("Wait until job finished")
+            utils.info("Submit the job to CE and wait to finish")
 
-        utils.wait_until_job_finishes(JOBID)
+            set_huge_jdl(utils,utils.get_jdl_file())
 
-        utils.info("Check logging info")
-
-        result=utils.run_command_continue_on_error("glite-wms-job-logging-info -v 3 --event UserTag %s"%(JOBID))
-
-        if result.find("OSB quota exceeded for") == -1:
-            utils.error("Not found message 'OSB quota exceeded for' at UserTag")
-            raise GeneralError("Check UserTag event","Not found message 'OSB quota exceeded for' at UserTag")
-        else:
-            utils.info("Find message 'OSB quota exceeded for' at UserTag event")
-
-        if result.find("Truncated last 52428800 bytes for file") == -1:
-            utils.error("Not found message 'Truncated last 52428800 bytes for file")
-            raise GeneralError("Check UserTag event","Not found message 'Truncated last 52428800 bytes for file' at UserTag")
-        else:
-            utils.info("Find message 'Truncated last 52428800 bytes for file' at UserTag event")
-
-        utils.info("Get job output")
-
-        utils.job_status(JOBID)
-
-        if utils.get_job_status().find("Done") != -1 :
-
-            utils.remove(utils.get_tmp_file())
-
-            utils.info("Retrieve the output")
-
-            utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
-
-            if os.path.isfile("%s/huge.tail"%(utils.get_job_output_dir())) :
-                utils.info("Output file (huge.tail) is correctly retrieved")
+            if len(ces[i])>0:
+                 utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
             else:
-                utils.error("Output file (huge.tail) is not correctly retrieved")
-                raise GeneralError("Check output file","Output file (huge.tail) is not correctly retrieved")
-            
-            utils.info("Check the size of the output file")
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
 
-            output=utils.run_command_continue_on_error("ls -l %s/"%(utils.get_job_output_dir()))
+            utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
 
-            if output.find("52428800")!=-1:
-               utils.info("huge.tail size is 52428800 bytes as expected")
+            res=Job_utils.submit_only_normal_job(utils,ces[i])
+
+            JOBID=res[1]
+
+            utils.info("Wait until job finished")
+
+            utils.wait_until_job_finishes(JOBID)
+
+            utils.info("Check logging info")
+
+            result=utils.run_command_continue_on_error("glite-wms-job-logging-info -v 3 --event UserTag %s"%(JOBID))
+
+            if result.find("OSB quota exceeded for") == -1:
+                utils.error("Not found message 'OSB quota exceeded for' at UserTag")
+                raise GeneralError("Check UserTag event","Not found message 'OSB quota exceeded for' at UserTag")
             else:
-               utils.error("huge.tail size is not 52428800 bytes as expected. We get %s"%(ouput))
-               raise GeneralError("Check the size of the ouput file","huge.tail size is not 52428800 bytes as expected")
-               
-        else:
-            utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            raise GeneralError("Check final job status","Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                utils.info("Find message 'OSB quota exceeded for' at UserTag event")
+
+            if result.find("Truncated last 52428800 bytes for file") == -1:
+                utils.error("Not found message 'Truncated last 52428800 bytes for file")
+                raise GeneralError("Check UserTag event","Not found message 'Truncated last 52428800 bytes for file' at UserTag")
+            else:
+                utils.info("Find message 'Truncated last 52428800 bytes for file' at UserTag event")
+
+            utils.info("Get job output")
+
+            utils.job_status(JOBID)
+
+            if utils.get_job_status().find("Done") != -1 :
+
+                utils.remove(utils.get_tmp_file())
+
+                utils.info("Retrieve the output")
+
+                utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+
+                if os.path.isfile("%s/huge.tail"%(utils.get_job_output_dir())) :
+                    utils.info("Output file (huge.tail) is correctly retrieved")
+                else:
+                    utils.error("Output file (huge.tail) is not correctly retrieved")
+                    raise GeneralError("Check output file","Output file (huge.tail) is not correctly retrieved")
+
+                utils.info("Check the size of the output file")
+
+                output=utils.run_command_continue_on_error("ls -l %s/"%(utils.get_job_output_dir()))
+
+                if output.find("52428800")!=-1:
+                   utils.info("huge.tail size is 52428800 bytes as expected")
+                else:
+                   utils.error("huge.tail size is not 52428800 bytes as expected. We get %s"%(ouput))
+                   raise GeneralError("Check the size of the ouput file","huge.tail size is not 52428800 bytes as expected")
+
+            else:
+                utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                raise GeneralError("Check final job status","Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
 
 
-        
-        SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
-        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
-        SSH_utils.close_ssh(ssh)
+            SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
+            SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
+            SSH_utils.close_ssh(ssh)
 
 
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
-        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
-        SSH_utils.close_ssh(ssh)
-        return 1
+        except (RunCommandError,GeneralError,TimeOutError) , e :
+            utils.log_error("%s"%(utils.get_current_test()))
+            utils.log_error("Command: %s"%(e.expression))
+            utils.log_error("Message: %s"%(e.message))
+            utils.log_traceback("%s"%(utils.get_current_test()))
+            utils.log_traceback(traceback.format_exc())
+            SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
+            SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
+            SSH_utils.close_ssh(ssh)
+            fails=fails+1
 
-    return 0
 
+    return fails
+    
 
 
 def test2(utils, title):
@@ -171,115 +182,9 @@ def test2(utils, title):
 
     try:
 
-        utils.info("Set MaxOuputSandboxSize=50M; to glite_wms.conf at WMS")
-
         ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
 
-        SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['MaxOutputSandboxSize'],['*'],['50M'])
-
-        utils.info("Restart workload manager glite-wms-wm")
-
-        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
-
-        utils.info("Submit the job to CREAM CE and wait to finish")
-
-        set_huge_jdl(utils,utils.get_jdl_file())
-        utils.set_destination_ce(utils.get_jdl_file(),"/cream-")
-
-        utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
-
-        res=Job_utils.submit_only_normal_job(utils,"/cream-")
-
-        if res[0]==1:
-           utils.error("Matching CE is not CREAM CE")
-           raise GeneralError("Error matching CE","Matching CE is not CREAM CE")
-        else:
-           JOBID=res[1]
-
-        utils.info("Wait until job finished")
-
-        utils.wait_until_job_finishes(JOBID)
-
-        utils.info("Check logging info")
-
-        result=utils.run_command_continue_on_error("glite-wms-job-logging-info -v 3 --event UserTag %s"%(JOBID))
-
-        if result.find("OSB quota exceeded for") == -1:
-            utils.error("Not found message 'OSB quota exceeded for' at UserTag")
-            raise GeneralError("Check UserTag event","Not found message 'OSB quota exceeded for' at UserTag")
-        else:
-            utils.info("Find message 'OSB quota exceeded for' at UserTag event")
-
-        if result.find("Truncated last 52428800 bytes for file") == -1:
-            utils.error("Not found message 'Truncated last 52428800 bytes for file")
-            raise GeneralError("Check UserTag event","Not found message 'Truncated last 52428800 bytes for file' at UserTag")
-        else:
-            utils.info("Find message 'Truncated last 52428800 bytes for file' at UserTag event")
-
-        
-        utils.info("Get job output")
-
-        utils.job_status(JOBID)
-
-        if utils.get_job_status().find("Done") != -1 :
-
-            utils.remove(utils.get_tmp_file())
-
-            utils.info("Retrieve the output")
-
-            utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
-
-            if os.path.isfile("%s/huge.tail"%(utils.get_job_output_dir())) :
-                utils.info("Output file (huge.tail) is correctly retrieved")
-            else:
-                utils.error("Output file (huge.tail) is not correctly retrieved")
-                raise GeneralError("Check output file","Output file (huge.tail) is not correctly retrieved")
-
-            utils.info("Check the size of the output file")
-
-            output=utils.run_command_continue_on_error("ls -l %s/"%(utils.get_job_output_dir()))
-
-            if output.find("52428800")!=-1:
-               utils.info("huge.tail size is 52428800 bytes as expected")
-            else:
-               utils.error("huge.tail size is not 52428800 bytes as expected. We get %s"%(ouput))
-               raise GeneralError("Check the size of the ouput file","huge.tail size is not 52428800 bytes as expected")
-
-        else:
-            utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-            raise GeneralError("Check final job status","Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
-
-
-        SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
-        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
-        SSH_utils.close_ssh(ssh)
-
-
-    except (RunCommandError,GeneralError,TimeOutError) , e :
-        utils.log_error("%s"%(utils.get_current_test()))
-        utils.log_error("Command: %s"%(e.expression))
-        utils.log_error("Message: %s"%(e.message))
-        utils.log_traceback("%s"%(utils.get_current_test()))
-        utils.log_traceback(traceback.format_exc())
-        SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
-        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
-        SSH_utils.close_ssh(ssh)
-        return 1
-
-    return 0
-
-
-
-def test3(utils, title):
-
-    utils.show_progress(title)
-    utils.info(title)
-
-    try:
-
-        ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
-
-        set_test3_jdl(utils,utils.get_jdl_file())
+        set_test2_jdl(utils,utils.get_jdl_file())
 
         utils.info("Submit a job")
 
@@ -368,9 +273,8 @@ def main():
 
     utils = Test_utils.Test_utils(sys.argv[0],"WMS Various Tests")
 
-    tests=["Test 1: Test OSB truncation , submit to LCG CE"]
-    tests.append("Test 2: Test OSB truncation , submit to CREAM CE")
-    tests.append("Test 3: Test drain operation")
+    tests=["Test 1: Test OSB truncation"]
+    tests.append("Test 2: Test drain operation")
 
     utils.prepare(sys.argv[1:],tests)
 
@@ -393,11 +297,7 @@ def main():
          if test2(utils, tests[1]):
             fails.append(tests[1])
 
-    if all_tests==1 or utils.check_test_enabled(3)==1 :
-         if test3(utils, tests[2]):
-            fails.append(tests[2])
-
-
+   
     if len(fails) > 0 :
       utils.exit_failure("%s test(s) fail(s): %s"%(len(fails), fails))
     else:

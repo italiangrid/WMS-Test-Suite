@@ -8,15 +8,23 @@ from Exceptions import *
 
 
 def prepare_normal_job(utils,filename,dest_ce=""):
+
     utils.set_isb_jdl(filename)
 
     if dest_ce !="":
-       utils.set_destination_ce(filename,dest_ce)
+       if utils.EXTERNAL_REQUIREMENTS==0:
+            utils.set_destination_ce(filename,dest_ce)
+       else:
+            utils.set_requirements("%s && %s"%(dest_ce,utils.DEFAULTREQ))
+
 
 def prepare_collection_job(utils,filename,dest_ce=""):
 
      if dest_ce !="":
-       utils.set_destination_ce(filename,dest_ce)
+       if utils.EXTERNAL_REQUIREMENTS==0:
+            utils.set_destination_ce(filename,dest_ce)
+       else:
+            utils.set_requirements("%s && %s"%(dest_ce,utils.DEFAULTREQ))
 
      # create 3 jdl files based on basic jdl file
      utils.info("Create 3 jdl files based on basic jdl file %s"%(filename))
@@ -36,27 +44,40 @@ def prepare_single_jdl_for_collection_job(utils,filename,dest_ce=""):
     utils.set_collection_external_jdls(filename)
 
     if dest_ce !="":
-        utils.set_destination_ce(filename,dest_ce)
+       if utils.EXTERNAL_REQUIREMENTS==0:
+            utils.set_destination_ce(filename,dest_ce)
+       else:
+            utils.set_requirements("%s && %s"%(dest_ce,utils.DEFAULTREQ))
 
 
 def prepare_parametric_job(utils,filename,dest_ce=""):
     utils.set_parametric_jdl(filename)
 
     if dest_ce !="":
-       utils.set_destination_ce(filename, dest_ce)
+        if utils.EXTERNAL_REQUIREMENTS==0:
+            utils.set_destination_ce(filename,dest_ce)
+        else:
+            utils.set_requirements("%s && %s"%(dest_ce,utils.DEFAULTREQ))
+
 
 def prepare_dag_job(utils,filename,dest_ce=""):
     utils.set_dag_jdl(filename)
 
     if dest_ce !="":
-       utils.set_destination_ce(filename, dest_ce)
+        if utils.EXTERNAL_REQUIREMENTS==0:
+            utils.set_destination_ce(filename,dest_ce)
+        else:
+            utils.set_requirements("%s && %s"%(dest_ce,utils.DEFAULTREQ))
 
 def prepare_mpi_job(utils,filename,dest_ce=""):
 
     utils.set_mpi_jdl(filename)
 
     if dest_ce !="":
-       utils.set_mpi_destination_ce(filename,dest_ce)
+        if utils.EXTERNAL_REQUIREMENTS==0:
+            utils.set_destination_ce(filename,dest_ce)
+        else:
+            utils.set_requirements("%s && %s"%(dest_ce,utils.DEFAULTREQ))
 
 
 def submit_normal_job(utils,dest_ce=""):
@@ -78,20 +99,22 @@ def submit_normal_job(utils,dest_ce=""):
 
         if dest_ce !="":
 
-            utils.info ("Check if it match a correct CE")
+            if utils.EXTERNAL_REQUIREMENTS==0:
 
-            OUTPUT=commands.getstatusoutput("grep %s <<< \"%s\" > /dev/null"%(dest_ce,CENAME))
+                utils.info ("Check if it match a correct CE")
 
-            if OUTPUT[0] != 0 :
-                utils.error("Matching CE is %s"%(CENAME))
-                utils.info("Cancel job %s"%(JOBID))
-                utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
-                ret[0]=1
-                ret[1]="Matchmaking fails"
-                raise GeneralError("Check destination CE","Error!!! Matching CE is %s"%(CENAME))
-                return ret
-            else:
-                utils.info("Matchmaking is ok , now wait job to finish ")
+                OUTPUT=commands.getstatusoutput("grep %s <<< \"%s\" > /dev/null"%(dest_ce,CENAME))
+
+                if OUTPUT[0] != 0 :
+                    utils.error("Matching CE is %s"%(CENAME))
+                    utils.info("Cancel job %s"%(JOBID))
+                    utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
+                    ret[0]=1
+                    ret[1]="Matchmaking fails"
+                    raise GeneralError("Check destination CE","Error!!! Matching CE is %s"%(CENAME))
+                    return ret
+                else:
+                    utils.info("Matchmaking is ok , now wait job to finish ")
 
 
         utils.wait_until_job_finishes (JOBID)
@@ -126,24 +149,26 @@ def submit_only_normal_job(utils,dest_ce=""):
 
         if dest_ce !="":
 
-            utils.dbg("Wait 60 secs before check job")
-            time.sleep(60)
+            if utils.EXTERNAL_REQUIREMENTS==0:
 
-            utils.info ("Check if it match a correct CE")
+                utils.dbg("Wait 60 secs before check job")
+                time.sleep(60)
 
-            OUTPUT=commands.getstatusoutput("grep %s <<< \"%s\" > /dev/null"%(dest_ce,CENAME))
+                utils.info ("Check if it match a correct CE")
 
-            if OUTPUT[0] != 0 :
-                utils.error("Matching CE is %s"%(CENAME))
-                utils.info("Cancel job %s"%(JOBID))
-                utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
-                ret[0]=1
-                ret[1]="Matchmaking fails"
-                raise GeneralError("Check destination CE","Error!!! Matching CE is %s"%(CENAME))
-                return ret
-            else:
-                utils.info("Matchmaking is ok , now wait job to finish ")
-                ret[1]=JOBID
+                OUTPUT=commands.getstatusoutput("grep %s <<< \"%s\" > /dev/null"%(dest_ce,CENAME))
+
+                if OUTPUT[0] != 0 :
+                    utils.error("Matching CE is %s"%(CENAME))
+                    utils.info("Cancel job %s"%(JOBID))
+                    utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
+                    ret[0]=1
+                    ret[1]="Matchmaking fails"
+                    raise GeneralError("Check destination CE","Error!!! Matching CE is %s"%(CENAME))
+                    return ret
+                else:
+                    utils.info("Matchmaking is ok , now wait job to finish ")
+                    ret[1]=JOBID
 
         return ret
 
@@ -177,20 +202,21 @@ def submit_collection_job(utils,dest_ce="",single_file=False):
 
         if dest_ce != "":
 
-            utils.info("Check if it match correct CEs")
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                utils.info("Check if it match correct CEs")
 
-            OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
-    
-            if OUTPUT[0] !=0 :
-                utils.error("Matching CE is not %s"%(dest_ce))
-                utils.info("Cancel job %s",JOBID)
-                utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
-                ret[0]=1
-                ret[1]="Matchmaking fails"
-                raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
-                return ret
-            else:
-                utils.info("Matchmaking is ok , now wait job to finish")
+                OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
+
+                if OUTPUT[0] !=0 :
+                    utils.error("Matching CE is not %s"%(dest_ce))
+                    utils.info("Cancel job %s",JOBID)
+                    utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
+                    ret[0]=1
+                    ret[1]="Matchmaking fails"
+                    raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
+                    return ret
+                else:
+                    utils.info("Matchmaking is ok , now wait job to finish")
 
         utils.wait_until_job_finishes (JOBID)
         ret=get_collection_job_output(utils,JOBID)
@@ -223,20 +249,22 @@ def submit_parametric_job(utils,dest_ce=""):
 
         if dest_ce != "" :
 
-            utils.info("Check if it match correct CEs")
+            if utils.EXTERNAL_REQUIREMENTS==0:
 
-            OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
+                utils.info("Check if it match correct CEs")
 
-            if OUTPUT[0] !=0 :
-                utils.error("Matching CE is not %s"%(dest_ce))
-                utils.info("Cancel job %s"%(JOBID))
-                utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
-                ret[0]=1
-                ret[1]="Matchmaking fails"
-                raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
-                return ret
-            else:
-                utils.info("Matchmaking is ok , now wait job to finish")
+                OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
+
+                if OUTPUT[0] !=0 :
+                    utils.error("Matching CE is not %s"%(dest_ce))
+                    utils.info("Cancel job %s"%(JOBID))
+                    utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
+                    ret[0]=1
+                    ret[1]="Matchmaking fails"
+                    raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
+                    return ret
+                else:
+                    utils.info("Matchmaking is ok , now wait job to finish")
 
         utils.wait_until_job_finishes (JOBID)
         ret=get_parametric_job_output(utils,JOBID)
@@ -269,21 +297,23 @@ def submit_dag_job(utils,dest_ce=""):
 
         if dest_ce !="" :
 
-            utils.info ("Check if it match correct CEs")
+            if utils.EXTERNAL_REQUIREMENTS==0:
 
-            OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
- 
-            if OUTPUT[0] !=0 :
-                utils.error("Matching CE is not %s"%(dest_ce))
-                utils.info("Used destination %s"%(OUTPUT[1]))
-                utils.info("Cancel job %s"%(JOBID))
-                utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
-                ret[0]=1
-                ret[1]="Matchmaking fails"
-                raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
-                return ret
-            else:
-                utils.ingo("Matchmaking is ok , now wait job to finish")
+                utils.info ("Check if it match correct CEs")
+
+                OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
+
+                if OUTPUT[0] !=0 :
+                    utils.error("Matching CE is not %s"%(dest_ce))
+                    utils.info("Used destination %s"%(OUTPUT[1]))
+                    utils.info("Cancel job %s"%(JOBID))
+                    utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
+                    ret[0]=1
+                    ret[1]="Matchmaking fails"
+                    raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
+                    return ret
+                else:
+                    utils.ingo("Matchmaking is ok , now wait job to finish")
 
         utils.wait_until_job_finishes (JOBID)
         ret=get_dag_job_output(utils,JOBID)
@@ -316,21 +346,23 @@ def submit_mpi_job(utils,dest_ce=""):
 
         if dest_ce !="" :
 
-            utils.info ("Check if it match correct CEs")
+            if utils.EXTERNAL_REQUIREMENTS==0:
 
-            OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
+                utils.info ("Check if it match correct CEs")
 
-            if OUTPUT[0] !=0 :
-                utils.error("Matching CE is not %s"%(dest_ce))
-                utils.info("Used destination %s"%(OUTPUT[1]))
-                utils.info("Cancel job %s"%(JOBID))
-                utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
-                ret[0]=1
-                ret[1]="Matchmaking fails"
-                raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
-                return ret
-            else:
-                utils.info("Matchmaking is ok , now wait job to finish")
+                OUTPUT=commands.getstatusoutput("glite-wms-job-status %s | grep 'Destination' | grep %s "%(JOBID,dest_ce))
+
+                if OUTPUT[0] !=0 :
+                    utils.error("Matching CE is not %s"%(dest_ce))
+                    utils.info("Used destination %s"%(OUTPUT[1]))
+                    utils.info("Cancel job %s"%(JOBID))
+                    utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s >> %s"%(JOBID,utils.get_tmp_file()))
+                    ret[0]=1
+                    ret[1]="Matchmaking fails"
+                    raise GeneralError("Check destination CE","Error !!! Matching CE is not %s"%(dest_ce))
+                    return ret
+                else:
+                    utils.info("Matchmaking is ok , now wait job to finish")
 
         utils.wait_until_job_finishes (JOBID)
         ret=get_mpi_job_output(utils,JOBID)
