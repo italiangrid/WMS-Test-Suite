@@ -331,6 +331,25 @@ class Regression_utils:
         FILE.close()
 
 
+    def change_jdl_attribute(self,jdl,attribute,value):
+
+        logging.info("Set new value (%s) at attribute %s"%(value,attribute))
+
+        FILE=open(jdl,"r")
+        lines=FILE.readlines()
+        FILE.close()
+
+        for line in lines:
+            if line.find(attribute)!=-1:
+                lines[lines.index(line)]="%s=%s;\n"%(attribute,value)
+                break
+
+        FILE=open(jdl,"w")
+
+        for line in lines:
+            FILE.write(line)
+
+        FILE.close()
 
     # define a simple jdl and save it in filename
     def set_jdl(self,filename):
@@ -1506,7 +1525,6 @@ class Regression_utils:
 
        output=' '.join(output_lines)
 
-
        if len(errors)!=0 :
 
           #Warning during glite-wms-wmproxy restart
@@ -1519,6 +1537,32 @@ class Regression_utils:
          logging.debug("Command output: %s",output)
 
        return output
+
+
+    def execute_remote_cmd_fail(self,ssh,cmd):
+
+       logging.info("Execute remote command %s",cmd)
+
+       stdin,stdout,stderr=ssh.exec_command(cmd)
+
+       errors=stderr.readlines()
+       output_lines=stdout.readlines()
+
+       output=' '.join(output_lines)
+       err_msg=' '.join(errors)
+
+       if len(errors)!=0 :
+
+          #Warning during glite-wms-wmproxy restart
+          if errors[0].find("warn")==-1 :
+            logging.info('Command %s failed as expected',cmd)
+            logging.debug("Command error message: %s",err_msg)
+       else:
+          logging.error("Command %s not failed as expected",cmd)
+          logging.error("Command output: %s",output)
+          raise GeneralError("Method execute_remote_cmd_fail","Error remote command %s not failed as expected"%(cmd))
+
+       return err_msg
 
 
     def ssh_put_file(self,ssh,src,dst):
