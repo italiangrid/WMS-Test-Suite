@@ -4,6 +4,7 @@ import sys
 import signal
 import commands
 import traceback
+import os.path
 
 from Exceptions import *
 
@@ -29,6 +30,9 @@ def test1(utils, title):
             utils.info("%s - %s"%(title,names[i]))
 
             utils.set_long_jdl(utils.get_jdl_file())
+            utils.add_jdl_attribute("StdOutput", "std.out")
+            utils.add_jdl_attribute("StdError", "std.err")
+            utils.add_jdl_general_attribute("OutputSandbox","{\"std.out\",\"std.err\"}")
 
             if len(ces[i])>0:
                 utils.set_requirements("%s && %s"%(ces[i],utils.DEFAULTREQ))
@@ -36,7 +40,7 @@ def test1(utils, title):
                 utils.set_requirements("%s"%utils.DEFAULTREQ)
 
             utils.add_jdl_attribute("MyProxyServer", utils.get_MYPROXY_SERVER())
-        
+
             utils.info("Submit a job with a short proxy")
             utils.set_proxy(utils.get_PROXY(),"00:14")
 
@@ -75,8 +79,21 @@ def test1(utils, title):
                     utils.error("TEST FAILS. Unexpected failed reason")
                     raise GeneralError("Check failed reason","Unexpected failed reason")
 
+            utils.remove(utils.get_tmp_file())
+
+            utils.info("Retrieve the output")
+
+            utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+
+            utils.info("Check if the output files are correctly retrieved")
+
+            if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+                utils.info("Output files are correctly retrieved")
             else:
-                utils.info("TEST PASS")
+                utils.error("Output files are not correctly retrieved")
+                raise GeneralError("Check output files","Output files are not correctly retrieved")
+                
+            utils.info("TEST PASS")
 
         except (RunCommandError,GeneralError,TimeOutError) , e :
             utils.log_error("%s"%(utils.get_current_test()))
@@ -102,7 +119,6 @@ def test2(utils, title):
     if len(names)==0:
         names.append("Default Test")
         ces.append("")
-
 
     for i in range(len(names)):
 
