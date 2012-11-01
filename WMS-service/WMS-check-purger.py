@@ -36,9 +36,11 @@ def test1(utils,ssh,title):
         condorio=SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir2))
 
         for line in condorio.split("\n"):
-            if line.find("https")!=-1:
-               target=line.lstrip().split(" ")[8]
-              
+
+            if line.find(JOBID.split("https://%s:9000/"%(utils.get_WMS()))[1])!=-1:
+                target="https_%s"%(line.lstrip().split("https_")[1])
+
+
         dir1="/var/SandboxDir/%s/%s"%(prefix,target)
 
         utils.info("Check files at %s"%(dir1))
@@ -62,18 +64,20 @@ def test1(utils,ssh,title):
             utils.info("Check on WMS auxiliary files should be removed")
 
             utils.info("Check directory %s"%(dir3))
-            output=SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir3)).split("\n")
 
-            if output.count("total 0")!=1:
+            output=SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir3))
+
+            if output.find(target)!=1:
                 utils.error("Auxiliary files are not removed from directory %s"%(dir3))
                 raise GeneralError("Check for auxiliary files at %s"%(dir3),"Auxiliary files are not removed from directory %s"%(dir3))
             else:
                 utils.info("Auxiliary files are removed as expected from directory %s"%(dir3))
 
             utils.info("Check directory %s"%(dir2))
-            output=SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir2)).split("\n")
 
-            if output.count("total 0")!=1:
+            output=SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir2))
+
+            if output.find(target)!=1:
                 utils.error("Auxiliary files are not removed from directory %s"%(dir2))
                 raise GeneralError("Check for auxiliary files at %s"%(dir2),"Auxiliary files are not removed from directory %s"%(dir2))
             else:
@@ -86,9 +90,9 @@ def test1(utils,ssh,title):
             utils.info("Check that also the SBD has been removed on WMS")
 
             utils.info("Check directory /var/SandboxDir/%s/"%(prefix))
-            output=SSH_utils.execute_remote_cmd(ssh,"ls -l /var/SandboxDir/%s/"%(prefix)).split("\n")
+            output=SSH_utils.execute_remote_cmd(ssh,"ls -l /var/SandboxDir/%s/"%(prefix))
 
-            if output.count("total 0")!=1:
+            if output.find(target)!=1:
                 utils.error("SBD not removed from directory /var/SandboxDir/%s/"%(prefix))
                 raise GeneralError("Check for SBD at /var/SandboxDir/%s/"%(prefix),"Auxiliary files are not removed from directory %s"%(dir2))
             else:
@@ -128,13 +132,20 @@ def test2(utils,ssh,title):
         utils.info("Check the SBD and the others file used by the services")
 
         prefix=JOBID.split("https://%s:9000/"%(utils.get_WMS()))[1][0:2]
-        
+
         dir="/var/SandboxDir/%s"%(prefix)
 
         utils.info("Check files at %s"%(dir))
 
-        SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir))
- 
+        sbd_files=SSH_utils.execute_remote_cmd(ssh,"ls -l %s"%(dir))
+
+        target=""
+
+        for line in sbd_files.split("\n"):
+            
+            if line.find(JOBID.split("https://%s:9000/"%(utils.get_WMS()))[1])!=-1:
+                target="https_%s"%(line.lstrip().split("https_")[1])
+                
         utils.info("Wait until job finishes")
 
         utils.wait_until_job_finishes(JOBID)
@@ -149,17 +160,15 @@ def test2(utils,ssh,title):
             
             utils.info("Check that the SBD has been removed on WMS")
 
-            utils.info("Check directory /var/SandboxDir/%s/"%(prefix))
+            utils.info("Check if directory /var/SandboxDir/%s/%s/ has been removed"%(prefix,target))
+            
             output=SSH_utils.execute_remote_cmd(ssh,"ls -l /var/SandboxDir/%s/"%(prefix))
-         
-            output=output.split("\n")
 
-            if output.count("total 0")!=1:
+            if output.find(target)!=-1:
                 utils.error("SBD not removed from directory /var/SandboxDir/%s/"%(prefix))
                 raise GeneralError("Check for SBD at /var/SandboxDir/%s/"%(prefix),"Auxiliary files are not removed from directory %s"%(dir))
             else:
                 utils.info("SBD has been removed as expected from directory /var/SandboxDir/%s/"%(prefix))
-
 
         else:
             utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
