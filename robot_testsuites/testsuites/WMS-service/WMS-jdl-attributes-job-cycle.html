@@ -1,0 +1,1710 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-jdl-attributes-job-cycle</title>
+</head>
+<body>
+<h1>WMS-jdl-attributes-job-cycle</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">WMS Job Cycle Test Suite\n\nTest a complete job cycle for normal job with non default jdl files\n\nAvailable Tests:\n\nTest 1: Jdl with AllowZippedISB\nTest 2: Jdl with ExpiryTime\nTest 3: Jdl with ShortDeadlineJob\nTest 4: Jdl with DataRequirements\nTest 5: Jdl with InputSandboxBaseURI\nTest 6: Jdl with OutputSandboxBaseDestURI\nTest 7: Jdl with OutputSandboxDestURI\n\n</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Job_utils.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/SSH_utils.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Collections</td>
+<td># List and dictionary manipulating library</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/service/jdl_job_cycle.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with AllowZippedISB">Jdl with AllowZippedISB</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Allowzipped JDL</td>
+<td>${utils}</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Submit the job</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${output}=</td>
+<td>Run Command</td>
+<td>glite-wms-job-submit ${utils.DELEGATION_OPTIONS} --debug --config ${utils.CONFIG_FILE} ${utils.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{messages}=</td>
+<td>Create List</td>
+<td>File archiving and file compression allowed by user in the JDL</td>
+<td>Archiving the ISB files</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>ISB ZIPPED file successfully created</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check debug output for expected messages</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>: FOR</td>
+<td>${message}</td>
+<td>IN</td>
+<td>@{messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Log Info</td>
+<td>Check for message: ${message}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Should Contain</td>
+<td>${output}</td>
+<td>${message}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>...</td>
+<td>Message '${message}' not found</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Log Info</td>
+<td>Message found</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}</td>
+<td>${ZippedISB}=</td>
+<td>Get Ids</td>
+<td>${output}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if AllowZippedISB attribute is added</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${output}=</td>
+<td>Run Command</td>
+<td>glite-wms-job-info --jdl ${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${output}</td>
+<td>AllowZippedISB = true;</td>
+<td>Attribute AllowZippedISB not added to the jdl</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Attribute AllowZippedISB successfully added to the jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if ZippedISB Attribute is added</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${output}</td>
+<td>ZippedISB = { "${ZippedISB}" };</td>
+<td>Unable to find ZippedISB={"${ZippedISB}"} to the jdl</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Attribute ZippedISB successfully added to the jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Wait until the job finished</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Wait Until Job Finishes</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Zipped JDL Output</td>
+<td>${utils}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with ExpiryTime">Jdl with ExpiryTime</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set ISB JDL</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>RetryCount</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Requirements</td>
+<td>false</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${time}=</td>
+<td>Get Time</td>
+<td>epoch</td>
+<td>NOW + 2min</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add Jdl General Attribute</td>
+<td>ExpiryTime</td>
+<td>${time}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Submit the Job</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Wait until the job finishes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Wait Until Job Finishes</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check job's final status</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status}=</td>
+<td>Get Job Status</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword Unless</td>
+<td>'${status}'=='Aborted'</td>
+<td>Fail</td>
+<td>Job's final status is not Aborted as expected , instead we get ${status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Job's final status is Aborted as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed reason</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${reason}=</td>
+<td>Get Job Status Reason</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword Unless</td>
+<td>'${reason}'=='request expired'</td>
+<td>Fail</td>
+<td>Aborted reason is not 'request expired' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Aborted reason is 'request expired' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with ShortDeadlineJob">Jdl with ShortDeadlineJob</a></td>
+<td>[Tags]</td>
+<td>case3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Case A: Submit to an LCG-CE</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set ISB Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>RetryCount</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>ShortDeadlineJob</td>
+<td>true</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Destination CE</td>
+<td>${utils.JDLFILE}</td>
+<td>2119/jobmanager</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Run Command</td>
+<td>glite-wms-job-list-match ${utils.DELEGATION_OPTIONS} --config ${utils.CONFIG_FILE} ${utils.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status1}</td>
+<td>${output1}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>Should Not Contain</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${message}</td>
+<td>No Computing Element matching your job requirements has been found</td>
+<td>No Computing Element matching your job requirements has been found</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status2}</td>
+<td>${output2}=</td>
+<td>Test SDJ Submission</td>
+<td>${utils}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${status1}</td>
+<td>2119/jobmanager</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Clean job output directory</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Case B: Submit to CREAM CE</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set ISB Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>RetryCount</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>ShortDeadlineJob</td>
+<td>true</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Destination CE</td>
+<td>${utils.JDLFILE}</td>
+<td>/cream-</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Run Command</td>
+<td>glite-wms-job-list-match ${utils.DELEGATION_OPTIONS} --config ${utils.CONFIG_FILE} ${utils.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status3}</td>
+<td>${output3}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>Should Not Contain</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${message}</td>
+<td>No Computing Element matching your job requirements has been found</td>
+<td>No Computing Element matching your job requirements has been found</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status4}</td>
+<td>${output4}=</td>
+<td>Test SDJ Submission</td>
+<td>${utils}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${status3}</td>
+<td>/cream-</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Clean job output directory</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Case C: Submit without restrictions</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set ISB Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>RetryCount</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Add JDL General Attribute</td>
+<td>ShortDeadlineJob</td>
+<td>true</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Run Command</td>
+<td>glite-wms-job-list-match ${utils.DELEGATION_OPTIONS} --config ${utils.CONFIG_FILE} ${utils.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status5}</td>
+<td>${output5}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>Should Not Contain</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${message}</td>
+<td>No Computing Element matching your job requirements has been found</td>
+<td>No Computing Element matching your job requirements has been found</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status6}</td>
+<td>${output6}=</td>
+<td>Test SDJ Submission</td>
+<td>${utils}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${status5}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Clean job output directory</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status1}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case A: No Computing Element matching your job requirements has been found</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status1}'=='PASS' and '${status2}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case A: ${output2}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status3}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case B: No Computing Element matching your job requirements has been found</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status3}'=='PASS' and '${status4}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case B: ${output4}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status5}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case C: No Computing Element matching your job requirements has been found</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status5}'=='PASS' and '${status6}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case C: ${output6}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with DataRequirements">Jdl with DataRequirements</a></td>
+<td>[Tags]</td>
+<td>case4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${LFC}</td>
+<td>Please set the required variables LFC , SE in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${SE}</td>
+<td>Please set the required variables LFC , SE in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${dir}=</td>
+<td>Set Variable</td>
+<td>/grid/${utils.VO}/${utils.ID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Create the directory ${dir}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Environment Variable</td>
+<td>LFC_HOST</td>
+<td>${utils.LFC}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>lfc-mkdir ${dir}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Creat the file file1.txt</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>lcg-cr --vo ${utils.VO} -d ${utils.SE} -l lfn:${dir}/file1.txt <a href="file://${CURDIR}/file1.txt">file://${CURDIR}/file1.txt</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_ces}=</td>
+<td>Create List</td>
+<td>/cream-</td>
+<td>2119/jobmanager</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_info}=</td>
+<td>Create List</td>
+<td>Submit to CREAM CE</td>
+<td>Submit to LCG CE</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[0]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status1}</td>
+<td>${output1}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>Datarequirements Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[0]</td>
+<td>${dir}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[1]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status2}</td>
+<td>${output2}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>Datarequirements Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[1]</td>
+<td>${dir}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status1}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[0] : ${output1}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status2}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[1] : ${output2}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with InputSandboxBaseURI">Jdl with InputSandboxBaseURI</a></td>
+<td>[Tags]</td>
+<td>case5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${ISB_DEST_HOSTNAME}</td>
+<td>Please set the required variables ISB_DEST_HOSTNAME, ISB_DEST_USERNAME, ISB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${ISB_DEST_USERNAME}</td>
+<td>Please set the required variables ISB_DEST_HOSTNAME, ISB_DEST_USERNAME, ISB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${ISB_DEST_PASSWORD}</td>
+<td>Please set the required variables ISB_DEST_HOSTNAME, ISB_DEST_USERNAME, ISB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Create directory to remote host</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${ssh}=</td>
+<td>Open SSH</td>
+<td>${utils.ISB_DEST_HOSTNAME}</td>
+<td>${utils.ISB_DEST_USERNAME}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils.ISB_DEST_PASSWORD}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Execute Remote Cmd</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>mkdir -p /tmp/${utils.ID}/isb</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Close SSH</td>
+<td>${ssh}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_ces}=</td>
+<td>Create List</td>
+<td>/cream-</td>
+<td>2119/jobmanager</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_info}=</td>
+<td>Create List</td>
+<td>Submit to CREAM CE</td>
+<td>Submit to LCG CE</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[0]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status1}</td>
+<td>${output1}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>ISBBaseURI Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[0]</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[1]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status2}</td>
+<td>${output2}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>ISBBaseURI Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[1]</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status1}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[0] : ${output1}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status2}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[1] : ${output2}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with OutputSandboxBaseDestURI">Jdl with OutputSandboxBaseDestURI</a></td>
+<td>[Tags]</td>
+<td>case6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${OSB_DEST_HOSTNAME}</td>
+<td>Please set the required variables OSB_DEST_HOSTNAME, OSB_DEST_USERNAME, OSB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${OSB_DEST_USERNAME}</td>
+<td>Please set the required variables OSB_DEST_HOSTNAME, OSB_DEST_USERNAME, OSB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${OSB_DEST_PASSWORD}</td>
+<td>Please set the required variables OSB_DEST_HOSTNAME, OSB_DEST_USERNAME, OSB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Create directory to remote host</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${ssh}=</td>
+<td>Open SSH</td>
+<td>${utils.OSB_DEST_HOSTNAME}</td>
+<td>${utils.OSB_DEST_USERNAME}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils.OSB_DEST_PASSWORD}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Execute Remote Cmd</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>mkdir -p -m 0777 /tmp/${utils.ID}/osbbase</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_ces}=</td>
+<td>Create List</td>
+<td>/cream-</td>
+<td>2119/jobmanager</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_info}=</td>
+<td>Create List</td>
+<td>Submit to CREAM CE</td>
+<td>Submit to LCG CE</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[0]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status1}</td>
+<td>${output1}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>OSBBaseDestURI Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[0]</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[1]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status2}</td>
+<td>${output2}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>OSBBaseDestURI Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[1]</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Close SSH</td>
+<td>${ssh}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status1}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[0] : ${output1}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status2}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[1] : ${output2}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Jdl with OutputSandboxDestURI">Jdl with OutputSandboxDestURI</a></td>
+<td>[Tags]</td>
+<td>case7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${OSB_DEST_HOSTNAME}</td>
+<td>Please set the required variables OSB_DEST_HOSTNAME, OSB_DEST_USERNAME, OSB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${OSB_DEST_USERNAME}</td>
+<td>Please set the required variables OSB_DEST_HOSTNAME, OSB_DEST_USERNAME, OSB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${OSB_DEST_PASSWORD}</td>
+<td>Please set the required variables OSB_DEST_HOSTNAME, OSB_DEST_USERNAME, OSB_DEST_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Create directory to remote host</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${ssh}=</td>
+<td>Open SSH</td>
+<td>${utils.OSB_DEST_HOSTNAME}</td>
+<td>${utils.OSB_DEST_USERNAME}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils.OSB_DEST_PASSWORD}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Execute Remote Cmd</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>mkdir -p -m 0777 /tmp/${utils.ID}/osbdest</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_ces}=</td>
+<td>Create List</td>
+<td>/cream-</td>
+<td>2119/jobmanager</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{target_info}=</td>
+<td>Create List</td>
+<td>Submit to CREAM CE</td>
+<td>Submit to LCG CE</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[0]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status1}</td>
+<td>${output1}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>OSBDestURI Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[0]</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Console Log</td>
+<td>Test Case @{target_info}[1]</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Empty Directory</td>
+<td>${utils.JOB_OUTPUT_DIR}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status2}</td>
+<td>${output2}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>OSBDestURI Test</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>@{target_ces}[1]</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Close SSH</td>
+<td>${ssh}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status1}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[0] : ${output1}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>'${status2}'=='FAIL'</td>
+<td>Append to List</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Case @{target_info}[1] : ${output2}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${utils}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Test SDJ Submission">Test SDJ Submission</a></td>
+<td>[Arguments]</td>
+<td>${utils}</td>
+<td>${run}</td>
+<td>${dest}=''</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run KeyWord If</td>
+<td>'${run}' == 'FAIL'</td>
+<td>Fail</td>
+<td>No Computing Elements found</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${status}</td>
+<td>${output}=</td>
+<td>Run Keyword And Ignore Error</td>
+<td>Submit Normal Job</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td>${dest}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Return]</td>
+<td>${status}</td>
+<td>${output}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>
