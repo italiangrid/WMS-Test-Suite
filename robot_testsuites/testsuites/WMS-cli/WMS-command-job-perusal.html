@@ -1,0 +1,737 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-command-job-perusal</title>
+</head>
+<body>
+<h1>WMS-command-job-perusal</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">TEST glite-wms-job-perusal command.\n\nAvailable test cases:\n\nTest 1: Check if command exists\nTest 2: Check --version option\nTest 3: Check --set option\nTest 4: Check --unset option\nTest 5: Check --set and --config options\nTest 6: Check --set and --output options\nTest 7: Check --set and --logfile options\nTest 8: Check --set , --logfile and --debug options\nTest 9: Check --get option\nTest 10: Check --get and --dir options\nTest 11: Check --get , --nodisplay and --all options\n</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Collections</td>
+<td># List and dictionary manipulating library</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td># The main WMS testing robot library , implemented as a python module.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td># This is the testsuite's configuration file. It contains a number of variables mandatory or not.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/cli/perusal.py</td>
+<td># Command related utils</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Check Executable">Check Executable</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Exist</td>
+<td>/usr/bin/glite-wms-job-perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --version option">Check --version option</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--version --config ${util.CONFIG_FILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${OUTPUT}</td>
+<td>User Interface version</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --set option">Check --set option</a></td>
+<td>[Tags]</td>
+<td>case3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --unset option">Check --unset option</a></td>
+<td>[Tags]</td>
+<td>case4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --set and --config options">Check --set and --config options</a></td>
+<td>[Tags]</td>
+<td>case5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out --config ${util.CONFIG_FILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable file perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --set and --output options">Check --set and --output options</a></td>
+<td>[Tags]</td>
+<td>case6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.OUTPUTFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out --output ${util.OUTPUTFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable file perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check output file</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.OUTPUTFILE}</td>
+<td>Output file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --set and --logfile options">Check --set and --logfile options</a></td>
+<td>[Tags]</td>
+<td>case7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out --logfile ${util.LOGFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable file perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check log file</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --set , --logfile and --debug options">Check --set , --logfile and --debug options</a></td>
+<td>[Tags]</td>
+<td>case8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out --logfile ${util.LOGFILE} --debug</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable file perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check log file</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${INPUT}=</td>
+<td>Get File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${INPUT}</td>
+<td>Debug</td>
+<td>Unable to find debug information in log file</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --get option">Check --get option</a></td>
+<td>[Tags]</td>
+<td>case9</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Enable file perusal for job: ${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--get -f std.out</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --get and --dir options">Check --get and --dir options</a></td>
+<td>[Tags]</td>
+<td>case10</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Enable file perusal for job: ${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--get -f std.out --dir ${util.JOB_OUTPUT_DIR}/perusal</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --get , --nodisplay and --all options">Check --get , --nodisplay and --all options</a></td>
+<td>[Tags]</td>
+<td>case11</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Enable file perusal for job: ${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--set --filename out.txt -f std.out</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--get -f std.out --nodisplay --all --dir ${util.JOB_OUTPUT_DIR}/perusal</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Disable perusal</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Perusal</td>
+<td>${util}</td>
+<td>--unset</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${util}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${util}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Perusal JDL</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>

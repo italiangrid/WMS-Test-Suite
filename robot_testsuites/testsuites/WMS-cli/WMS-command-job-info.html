@@ -1,0 +1,982 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-command-job-info</title>
+</head>
+<body>
+<h1>WMS-command-job-info</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">TEST glite-wms-job-info command.\n\nAvailable test cases:\n\nTest 1: Check if command exists\n\nTest 2: Check --version option\n\nTest 3: For mandatory option --jdl check options --config, --output , --logfile , --debug , --input , --endpoint and all options together\n\nTest 4: For mandatory option --jdl-original check options --config, --output , --logfile , --debug , --input , --endpoint and all options together\n\nTest 5: For madatory option --proxy check options --config, --output , --logfile , --debug , --input , --endpoint and all options together\n\nTest 6: For mandatory option --delegationid check options --config , --output , --logfile , --debug , --endpoint and all options together\n\nTest 7: Check the edg_jobid parameter in the registered jdl\n\nTest 8: Check the expiration time of the delegation\n</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Collections</td>
+<td># List and dictionary manipulating library</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td># The main WMS testing robot library , implemented as a python module.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td># This is the testsuite's configuration file. It contains a number of variables mandatory or not.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/cli/job-info.py</td>
+<td># Command related utils</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Check Executable">Check Executable</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Exist</td>
+<td>/usr/bin/glite-wms-job-info</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --version option">Check --version option</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>--version --config ${util.CONFIG_FILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${OUTPUT}</td>
+<td>User Interface version</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Tests for option --jdl">Tests for option --jdl</a></td>
+<td>[Tags]</td>
+<td>case3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Config Option</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Output Option</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Logfile Option</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Debug Option</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Endpoint Option</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Input Option</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check All Options</td>
+<td>--jdl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Tests for option --jdl-original">Tests for option --jdl-original</a></td>
+<td>[Tags]</td>
+<td>case4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Config Option</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Output Option</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Logfile Option</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Debug Option</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Endpoint Option</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Input Option</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check All Options</td>
+<td>--jdl-original</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Tests for option --proxy">Tests for option --proxy</a></td>
+<td>[Tags]</td>
+<td>case5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Config Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Output Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Logfile Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Debug Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Endpoint Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Input Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check All Options</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Tests for option --delegationid">Tests for option --delegationid</a></td>
+<td>[Tags]</td>
+<td>case6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Config Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Output Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Logfile Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Debug Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Endpoint Option</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check All Options</td>
+<td>--proxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check the edg_jobid parameter in the registered jdl">Check the edg_jobid parameter in the registered jdl</a></td>
+<td>[Tags]</td>
+<td>case7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>--jdl</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${edg_line}=</td>
+<td>Get Lines Containing String</td>
+<td>${OUTPUT}</td>
+<td>edg_jobid =</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>@{words}=</td>
+<td>Split String</td>
+<td>${edg_line}</td>
+<td>=</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${edg_jobid}=</td>
+<td>Clear Jobid</td>
+<td>@{words}[1]</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal As Strings</td>
+<td>${edg_jobid}</td>
+<td>${JOBID}</td>
+<td>The registered jdl has not the correct Job Id. Expected ${JOBID} and returned ${edg_jobid}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check the expiration time of the delegation">Check the expiration time of the delegation</a></td>
+<td>[Tags]</td>
+<td>case8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE} ${util.DELEGATION_OPTIONS}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${deleg_exp}</td>
+<td>Get Expiry Time</td>
+<td>${OUTPUT}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>--proxy</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${proxy_exp}=</td>
+<td>Get Expiry Time</td>
+<td>${OUTPUT}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Be Equal As Strings</td>
+<td>${deleg_exp}</td>
+<td>${proxy_exp}</td>
+<td>The delegation proxy expires ${deleg_exp} while the user proxy expires ${proxy_exp}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${util}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${util}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Define Delegation</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Submit a job</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Run Command</td>
+<td>glite-wms-job-submit ${util.DELEGATION_OPTIONS} --config ${util.CONFIG_FILE} --nomsg ${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Run Command</td>
+<td>glite-wms-job-cancel --noint ${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Config Option">Check Config Option</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check --config option</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --config ${util.CONFIG_FILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Output Option">Check Output Option</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check --output option</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.OUTPUTFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --config ${util.CONFIG_FILE} --output ${util.OUTPUTFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.OUTPUTFILE}</td>
+<td>Output file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Logfile Option">Check Logfile Option</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check --logfile option</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --config ${util.CONFIG_FILE} --logfile ${util.LOGFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Debug Option">Check Debug Option</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check --debug option</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --config ${util.CONFIG_FILE} --logfile ${util.LOGFILE} --debug</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${text}=</td>
+<td>Get File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${text}</td>
+<td>Debug</td>
+<td>Unable to find debug information</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Endpoint Option">Check Endpoint Option</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check --endpoint option</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --endpoint <a href="https://${util.WMS}:7443/glite_wms_wmproxy_server">https://${util.WMS}:7443/glite_wms_wmproxy_server</a></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${OUTPUT}</td>
+<td>Connecting to the service <a href="https://${util.WMS}:7443/glite_wms_wmproxy_server">https://${util.WMS}:7443/glite_wms_wmproxy_server</a></td>
+<td>Unable to find the specified endpoint</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Input Option">Check Input Option</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check --input option</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>echo ${JOBID} &gt; ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --input ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check All Options">Check All Options</a></td>
+<td>[Arguments]</td>
+<td>${option}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check all options together</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove Files</td>
+<td>${util.LOGFILE}</td>
+<td>${util.OUTPUTFILE}</td>
+<td>${util.MYTMPDIR}/jobid.txt</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>echo ${JOBID} &gt; ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Job Info</td>
+<td>${util}</td>
+<td>${option} --noint --debug --input ${util.MYTMPDIR}/jobid.txt --config ${util.CONFIG_FILE} --output ${util.OUTPUTFILE} --logfile ${util.LOGFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.OUTPUTFILE}</td>
+<td>Output file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>
