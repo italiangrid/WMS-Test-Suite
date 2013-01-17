@@ -5,6 +5,7 @@ import signal
 import traceback
 import commands
 import os.path
+import time
 
 from Exceptions import *
 
@@ -265,6 +266,97 @@ def test2(utils, title):
     return 0
 
 
+def test3(utils, title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    try:
+
+        ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
+
+        utils.info("Get last access date for script /opt/lcg/sbin/grid_monitor.sh before submission")
+
+        output=SSH_utils.execute_remote_cmd(ssh, "ls -lu --time-style=full-iso `locate grid_mon`")
+
+        before_access=''
+
+        for line in output.split("\n"):
+            if line.find("/opt/lcg/sbin/grid_monitor.sh")!=-1 and line.find("/usr/sbin/grid_monitor.sh")==-1:
+                before_access=line
+
+        if len(before_access)==0:
+            utils.error("Unable to find script /opt/lcg/sbin/grid_monitor.sh")
+            raise GeneralError("Check if script /opt/lcg/sbin/grid_monitor.sh has been used during the job submission","Unable to find script /opt/lcg/sbin/grid_monitor.sh")
+
+        utils.info("Wait 10 secs")
+        time.sleep(10)
+
+        utils.info("Submit a job to GRAM CE")
+        utils.set_jdl(utils.get_jdl_file())
+        utils.set_destination_ce(utils.get_jdl_file(),"2119/jobmanager")
+
+        JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+        utils.job_status(JOBID)
+
+        while utils.get_job_status().find("Ready")!=-1 or utils.get_job_status().find("Waiting")!=-1:
+            utils.info("Wait 30 secs")
+            time.sleep(30)
+            utils.job_status(JOBID)
+
+        utils.info("Get last access date for script /opt/lcg/sbin/grid_monitor.sh after submission")
+
+        output=SSH_utils.execute_remote_cmd(ssh, "ls -lu  --time-style=full-iso `locate grid_mon`")
+
+        SSH_utils.close_ssh(ssh)
+
+        after_access=''
+
+        for line in output.split("\n"):
+            if line.find("/opt/lcg/sbin/grid_monitor.sh")!=-1 and line.find("/usr/sbin/grid_monitor.sh")==-1:
+                after_access=line
+
+        for value in before_access.split(" "):
+            if value.find(":")!=-1:
+                before_time=value.split(".")[0]
+
+            if value.find("-")!=-1 and value.find("->")==-1:
+                before_date=value
+
+        for value in after_access.split(" "):
+            if value.find(":")!=-1:
+                after_time=value.split(".")[0]
+
+            if value.find("-")!=-1 and value.find("->")==-1:
+                after_date=value
+
+        before=time.mktime(time.strptime("%s %s"%(before_date,before_time),"%Y-%m-%d %H:%M:%S"))
+        after=time.mktime(time.strptime("%s %s"%(after_date,after_time),"%Y-%m-%d %H:%M:%S"))
+
+        utils.info("Check if script /opt/lcg/sbin/grid_monitor.sh has been used during the job submission")
+
+        if after>before:
+            utils.info("Check OK, script /opt/lcg/sbin/grid_monitor.sh has been used during the job submission")
+        else:
+            utils.error("Test failed, script /opt/lcg/sbin/grid_monitor.sh hasn't been used during the job submission")
+            utils.error("Access details before submission: %s %s"%(before_date,before_time))
+            utils.error("Access details after submission: %s %s"%(after_date,after_time))
+            raise GeneralError("Check if script /opt/lcg/sbin/grid_monitor.sh has been used during the job submission","Test failed, script /opt/lcg/sbin/grid_monitor.sh hasn't been used during the job submission")
+
+        utils.info("TEST PASS")
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        SSH_utils.close_ssh(ssh)
+        return 1
+
+    return 0
+
 
     
 def main():
@@ -275,6 +367,7 @@ def main():
 
     tests=["Test 1: Test OSB truncation"]
     tests.append("Test 2: Test drain operation")
+    tests.append("Test 3: Test the usage of grid_monitor.sh script ")
 
     utils.prepare(sys.argv[1:],tests)
 
@@ -297,6 +390,9 @@ def main():
          if test2(utils, tests[1]):
             fails.append(tests[1])
 
+    if all_tests==1 or utils.check_test_enabled(3)==1 :
+         if test3(utils, tests[2]):
+            fails.append(tests[2])
    
     if len(fails) > 0 :
       utils.exit_failure("%s test(s) fail(s): %s"%(len(fails), fails))
