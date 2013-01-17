@@ -1,0 +1,10 @@
+Executable = "/bin/false";
+Arguments = "";
+StdOutput = "out.log";
+StdError = "err.log";
+InputSandbox = {};
+OutputSandbox = {};
+myproxyserver="";
+requirements = !RegExp("cream.*", other.GlueCEUniqueID);
+RetryCount = 0;
+ShallowRetryCount = 1;
