@@ -26,7 +26,7 @@ def test1(utils,ssh,title):
         utils.info("Set jobSubmit  = %s; and jobRegister  = %s; to glite_wms.conf at WMS"%(job_submit,job_register))
 
         SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['jobSubmit','jobRegister'],['*','*'],[job_submit,job_register])
-        
+
         utils.info("Restart workload manager proxy glite-wms-wmproxy")
 
         SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wmproxy restart")
@@ -70,7 +70,45 @@ def test1(utils,ssh,title):
             if line.find("Method")!=-1:
                utils.info("Get Method: %s"%(line))
                break
-        
+
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --load1, 'Load Average(1 min)'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Load Average(1 min):")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --load1 'Load Average(1 min)' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected thershold is not for parameter load1 ('Load Average(1 min)') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter load1 ('Load Average(1 min)') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
         utils.info("Test OK")
     
         utils.info("Restore initial version of glite-wms.conf file")
@@ -151,6 +189,45 @@ def test2(utils,ssh,title):
             if line.find("Method")!=-1:
                utils.info("Get Method: %s"%(line))
                break
+
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --load5, 'Load Average(5 min)'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Load Average(5 min):")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --load5 'Load Average5 min)' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter load5 ('Load Average(5 min)') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter load5 ('Load Average(5 min)') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
 
         utils.info("Test OK")
 
@@ -234,6 +311,45 @@ def test3(utils,ssh,title):
                utils.info("Get Method: %s"%(line))
                break
 
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --load15, 'Load Average(15 min)'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Load Average(15 min):")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --load15 'Load Average15 min)' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter load15 ('Load Average(15 min)') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter load15 ('Load Average(15 min)') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
+
         utils.info("Test OK")
 
         utils.info("Restore initial version of glite-wms.conf file")
@@ -281,6 +397,44 @@ def test4(utils,ssh,title):
         utils.info("Submit a job , submission should be failed")
 
         OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --memusage, 'Memory Usage'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Memory Usage:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --memusage 'Memory Usage)' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --memusage ('Memory Usage') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --memusage ('Memory Usage') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
 
         utils.info("Check failed message")
 
@@ -398,6 +552,44 @@ def test5(utils,ssh,title):
                utils.info("Get Method: %s"%(line))
                break
 
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --swapusage, 'Swap Usage'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Swap Usage:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --swapusage 'Swap Usage' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --swapusage ('Swap Usage') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --swapusage ('Swap Usage') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
         utils.info("Test OK")
 
         utils.info("Restore initial version of glite-wms.conf file")
@@ -480,6 +672,44 @@ def test6(utils,ssh,title):
                utils.info("Get Method: %s"%(line))
                break
 
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --ftpconn, 'FTP Connection'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for FTP Connection:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --ftpconn 'FTP Connection' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --ftpconn ('FTP Connection') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --ftpconn ('FTP Connection') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
         utils.info("Test OK")
 
         utils.info("Restore initial version of glite-wms.conf file")
@@ -526,6 +756,44 @@ def test7(utils,ssh,title):
         utils.info("Submit a job , submission should be failed")
 
         OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --diskusage, 'Disk Usage'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Disk Usage:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --diskusage 'Disk Usage' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --diskusage ('Disk Usage') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --diskusage ('Disk Usage') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
 
         utils.info("Check failed message")
 
@@ -643,6 +911,44 @@ def test8(utils,ssh,title):
                utils.info("Get Method: %s"%(line))
                break
 
+        utils.info("Register a job, registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --fdnum, 'Threshold for used file descriptor'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for Free FD:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --fdnum 'Threshold for used file descriptor' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --fdnum ('Threshold for used file descriptor') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --fdnum ('Threshold for used file descriptor') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
         utils.info("Test OK")
 
         utils.info("Restore initial version of glite-wms.conf file")
@@ -691,13 +997,53 @@ def test9(utils,ssh,title):
 
         SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm stop")
 
-        utils.info("Submit a job")
+        output=SSH_utils.execute_remote_cmd(ssh,"/usr/sbin/glite_wms_wmproxy_load_monitor")
 
-        jobid=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file())).split("\n")
+        if output.find("Detected value for WMS Input JobDir jobs /var/workload_manager/jobdir : 0")!=-1:        
+            utils.info("Submit a job")
+            utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
 
         utils.info("Submit a job , submission should be failed")
 
         OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --jdnum, 'Threshold for number of unprocessed jobs (for jobdir)'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for WMS Input JobDir jobs:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --jdnum 'Threshold for number of unprocessed jobs (for jobdir)' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --jdnum ('Threshold for number of unprocessed jobs (for jobdir)') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --jdnum ('Threshold for number of unprocessed jobs (for jobdir)') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
 
         utils.info("Check failed message")
 
@@ -786,6 +1132,44 @@ def test10(utils,ssh,title):
         utils.info("Submit a job , submission should be failed")
 
         OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
+
+        utils.info("Check failed message")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("System load is too high")!=-1:
+                utils.info("Check OK, the detected failure reason is: 'System load is too high'")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Faulure reason is not 'System load is too high' as expected.")
+            raise GeneralError("Check faulure reason","Failure reason is not 'System load is too high' as expected")
+
+        utils.info("Check if the detected threshold is for parameter --jdsize, 'Threshold for input jobdir size (KB)'")
+
+        find=0
+
+        for line in OUTPUT:
+            if line.find("Threshold for WMS Input JobDir size:")!=-1:
+                utils.info("Check OK, detected threshold is for parameter --jdsize 'Threshold for input jobdir size (KB)' as expected")
+                find=1
+                break
+
+        if find==0:
+            utils.error("Detected threshold is not for parameter --jdsize ('Threshold for input jobdir size (KB)') as expected")
+            raise GeneralError("Check the parameter of the limiter mechanism","Detected threshold is not for parameter --jdsize ('Threshold for input jobdir size (KB)') as expected ")
+
+
+        for line in OUTPUT:
+            if line.find("Method")!=-1:
+               utils.info("Get Method: %s"%(line))
+               break
+
+        utils.info("Register a job , registration should be failed")
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --register-only %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()),1).split("\n")
 
         utils.info("Check failed message")
 
