@@ -29,8 +29,8 @@ def run(utils):
      
     logging.info("Remove any previous pid files")
 
-    utils.execute_remote_cmd(ssh,"rm /var/run/glite-wms-workload_manager.pid")
-    utils.execute_remote_cmd(ssh,"rm /var/run/glite-wms-ice-safe.pid")
+    utils.execute_remote_cmd(ssh,"rm -f /var/run/glite-wms-workload_manager.pid")
+    utils.execute_remote_cmd(ssh,"rm -f /var/run/glite-wms-ice-safe.pid")
 
     logging.info("Start Workload Manager and ICE")
 
