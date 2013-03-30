@@ -1,0 +1,83 @@
+[
+  Type = "collection";
+  InputSandbox = {"data/Test.sh"};
+  RetryCount = 1;
+  Requirements = ( random(1.0) < 0.5 );
+  ShallowRetryCount = 2;
+
+  nodes = {
+
+    [
+        JobType = "Normal";
+        Zippedisb=true;
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        InputSandbox = {"data/input1.txt"};
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {};
+    ]
+  }
+]

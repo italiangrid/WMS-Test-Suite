@@ -1,0 +1,8 @@
+Executable = "/bin/ls" ;
+Arguments = "-lha " ;
+Stdoutput = "ls.out" ;
+InputSandbox = { "lib/data/supercalifragilistichespiralidose.txt", "lib/data/82687.jdl"} ;
+OutputSandbox = { ".BrokerInfo", "ls.out"} ;
+Retrycount = 2;
+ShallowRetryCount = -1;
+usertags = [ bug = "#82687" ];

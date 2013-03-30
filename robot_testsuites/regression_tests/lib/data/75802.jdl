@@ -1,0 +1,8 @@
+[
+    Executable = "/bin/env";
+    Stdoutput = "env.out" ;
+    StdError = "env.err" ;
+    shallowretrycount = 2;
+    OutputSandbox = { "env.out" ,"env.err" } ;
+    Environment = "FOO=bar";
+]

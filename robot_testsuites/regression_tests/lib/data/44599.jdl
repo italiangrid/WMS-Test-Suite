@@ -1,0 +1,13 @@
+[
+Executable = "/bin/true";
+Arguments = "";
+StdOutput = "out.log";
+StdError = "err.log";
+OutputSandbox = {};
+InputSandbox = {"data/input1.txt"};
+rank = - other.GlueCEStateEstimatedResponseTime ;
+//Requirements = !RegExp("cream.*", other.GlueCEUniqueID);
+Requirements = true;
+RetryCount = 0;
+ShallowRetryCount = -1;
+]

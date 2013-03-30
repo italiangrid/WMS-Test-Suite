@@ -1,0 +1,12 @@
+[
+  Type = "Job";
+  Executable = "27215_exe.sh";
+  Arguments = "70";
+  StdOutput = "test.out";
+  StdError = "test.err";
+  Environment = {"GLITE_LOCAL_MAX_OSB_SIZE=35"};
+  InputSandbox = {"lib/data/27215_exe.sh"};
+  OutputSandbox = {"test.err","test.out","out2", "out1"};
+  usertags = [ bug = "27215" ];
+  
+]

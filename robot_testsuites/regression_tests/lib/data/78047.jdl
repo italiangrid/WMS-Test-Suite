@@ -1,0 +1,9 @@
+JobType="Normal";
+Executable = "/bin/sleep";
+Arguments = "1800";
+RetryCount = 0;
+Shallowretrycount = 0;
+StdError = "stderr.log";
+StdOutput = "stdout.log";
+OutputSandbox = {"stderr.log", "stdout.log"};
+EnableWMSFeedback = true;

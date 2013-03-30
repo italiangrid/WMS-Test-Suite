@@ -1,0 +1,7 @@
+[ 
+Executable = "/bin/ls"; 
+prologue = "/bin/false"; 
+shallowretrycount = -1; 
+RetryCount = 3; 
+usertags = [ exe = "deepresub" ]; 
+] 

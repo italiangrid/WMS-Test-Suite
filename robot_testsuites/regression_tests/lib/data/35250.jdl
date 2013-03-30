@@ -1,0 +1,26 @@
+
+    type = "dag";
+    DefaultNodeShallowRetryCount = 1;
+    InputSandbox = {"lib/data/Test35250.sh","lib/data/input1.txt"};
+    AllowZippedISB=true;
+   
+    nodes = [
+
+      nodeA = [       
+          file ="lib/data/test35250.jdl" ;
+      ];
+
+      nodeB = [
+          file ="lib/data/test35250.jdl" ;
+      ];
+
+      nodeC = [
+          file="lib/data/test35250.jdl";
+      ];
+       
+       dependencies = {
+        { nodeA, nodeB },
+        { nodeA, nodeC }
+       }
+     ];
+  

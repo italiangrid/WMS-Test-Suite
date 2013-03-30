@@ -1,0 +1,8 @@
+Executable = "/bin/sleep";
+Arguments = "900";
+InputSandbox = {};
+stdoutput="stdout";
+stderror="stderr";
+OutputSandbox = {"stdout","stderr"};
+Requirements = RegExp("/cream-", other.GlueCEUniqueID);
+MyProxyServer="unknown.somehost.com:7000";

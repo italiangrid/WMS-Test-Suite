@@ -1,0 +1,15 @@
+// Test parametric job.
+// The standar Output and Error are parametrizied such as the
+// enviroment variable: MYPATH_PARAM_.
+[
+JobType = "parametric";
+Executable = "/bin/env";
+Environment = {"MYPATH_PARAM_=$PATH:/bin:/usr/bin:$HOME"};
+StdOutput = "echo_PARAM_.out";
+StdError = "echo_PARAM_.err";
+OutputSandbox = {"echo_PARAM_.out","echo_PARAM_.err"};
+ParameterStart = 0;
+ParameterStep = 2;
+Parameters = 10;
+myproxyserver="";
+]

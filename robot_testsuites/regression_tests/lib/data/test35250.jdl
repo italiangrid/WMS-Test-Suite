@@ -1,0 +1,7 @@
+JobType = "Normal" ;
+Executable = "Test35250.sh";
+InputSandbox = {"lib/data/Test35250.sh"};
+OutputSandbox = {"stdout","stderror"};
+StdOutput = "stdout";
+StdError = "stderror";
+RetryCount = 0;

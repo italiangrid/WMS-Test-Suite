@@ -1,0 +1,11 @@
+[
+ Executable = "/usr/bin/env" ;
+ Stdoutput = "env.out" ;
+ StdError =  "env.err" ;
+ shallowretrycount = 2;
+ InputSandbox = { "lib/data/input1.txt" };
+ OutputSandbox = { "env.out" ,"env.err", "input1.txt" } ;
+ Environment={"LD_LIBRARY_PATH=."};
+ usertags = [ bug = "28642" ];
+ Requirements = !regexp("8443/cream", other.GlueCEUniqueID);
+]

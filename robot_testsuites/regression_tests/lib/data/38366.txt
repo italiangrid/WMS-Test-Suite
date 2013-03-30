@@ -1,0 +1,35 @@
+[
+   arguments =
+         [ ad =
+            [
+               requirements = ( other.GlueCEStateStatus =="Production" || other.GlueCEStateStatus == "CREAMPreCertTests" ) &&
+!RegExp(".*sdj$",other.GlueCEUniqueID);
+               RetryCount = 3;
+               Arguments = "/tmp";
+               MyProxyServer = "myproxy.cnaf.infn.it";
+               AllowZippedISB = true;
+               JobType ="normal";
+               InputSandboxDestFileName = { "pippo","pluto" };
+               SignificantAttributes = { "Requirements","Rank" };
+               FuzzyRank = true;
+               Executable = "/bin/ls";
+              CertificateSubject = "/C=IT/O=INFN/OU=Personal Certificate/L=Padova/CN=Alessio Gianelle";
+              X509UserProxy ="/tmp/user.proxy.6056.20080625153135905";
+              Stdoutput = "ls.out";
+              VOMS_FQAN = "/dteam/Role=NULL/Capability=NULL";
+              OutputSandbox = { "ls.out" };
+              VirtualOrganisation = "dteam";
+              usertags = [ exe = "ls" ];
+              rank =-other.GlueCEStateEstimatedResponseTime;
+              Type = "job"; ShallowRetryCount = 3;
+              InputSandbox = { "protocol://address/input/pippo","protocol://address/input/pluto" };
+             Fuzzyparameter = 1.000000000000000E-01 ];
+
+          include_brokerinfo = false;
+          file ="/tmp/6056.20080625153135905";
+           number_of_results = -1
+];
+
+command = "match";
+version = "1.0.0"
+]

@@ -1,0 +1,10 @@
+Executable = "perusal.sh";
+Arguments = "out.txt";
+StdOutput = "std.out";
+StdError = "std.err";
+InputSandbox = {"lib/data/perusal.sh"};
+OutputSandbox = {"std.out","std.err","out.txt"};
+EnableZippedIsb=true;
+PerusalFileEnable = true;
+rank = 1;
+requirements = true;
