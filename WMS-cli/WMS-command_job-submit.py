@@ -833,29 +833,6 @@ def main():
             utils.log_traceback(traceback.format_exc())
     
     
-
-    """
-    # Test option --dag
-    utils.show_progress("Test 22")
-    logging.info("Test 22: Check --dag option")
-    utils.info ("")
-    utils.info ("Test --dag option")
-
-    utils.remove(utils.get_tmp_file())
-
-    # create dag nodes jdl files
-    JOBID=utils.run_command ("%s %s --config %s --nomsg --dag %s"%(COMMAND,utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
-
-    utils.debug ("Job ID is %s"%(JOBID))
-    utils.info ("Check the dag status")
-    utils.run_command ("glite-wms-job-status %s >> %s"%(JOBID,utils.get_tmp_file()))
-    utils.info ("Check command output")
-    utils.run_command("cat %s"%(utils.get_tmp_file()))
-    utils.remove(utils.get_tmp_file())
-    utils.run_command("glite-wms-job-cancel --noint %s"%(JOBID))
-
-    """
-
     # Test option --nodes-resource
     utils.show_progress("Test 22")
 

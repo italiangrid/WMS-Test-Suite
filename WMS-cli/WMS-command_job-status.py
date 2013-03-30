@@ -296,16 +296,6 @@ def main():
             utils.log_traceback("%s"%(utils.get_current_test()))
             utils.log_traceback(traceback.format_exc())
 
-    """
-    utils.show_progress("Test 13")
-    utils.info ("")
-    utils.info ("Test the --to option")
-
-
-    utils.show_progress("Test 14")
-    utils.info ("")
-    utils.info ("Test the --from option")
-    """
 
     if fails > 0 :
       utils.exit_failure("%s test(s) fail(s)"%(fails))

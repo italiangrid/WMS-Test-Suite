@@ -360,34 +360,7 @@ def main():
             utils.log_traceback("%s"%(utils.get_current_test()))
             utils.log_traceback(traceback.format_exc())
 
-    """
-    utils.show_progress("Test 12")
 
-    utils.wait_until_job_finishes (JOBID9)
-
-    try:
-    
-        utils.show_progress("Test 12")
-        logging.info("Test 12: Try to retrieve output of a Cleared job")
-        utils.info ("")
-        utils.info ("Try to retrieve output of a Cleared job")
-        utils.run_command ("%s --output %s %s"%(COMMAND,utils.get_output_file(),JOBID9))
-        check (utils,JOBID9)
-        utils.info ("Check the output file")
-        utils.run_command ("cat %s"%(utils.get_output_file()))
-        utils.info ("")
-        utils.info ("Try to purge a Cleared job")
-        utils.run_command_fail ("%s --noint %s"%(COMMAND,JOBID9))
-
-     except (RunCommandError,GeneralError,TimeOutError) , e :
-            fails=fails+1
-            utils.log_error("%s"%(utils.get_current_test()))
-            utils.log_error("Command: %s"%(e.expression))
-            utils.log_error("Message: %s"%(e.message))
-            utils.log_traceback("%s"%(utils.get_current_test()))
-            utils.log_traceback(traceback.format_exc())
-
-    """
     
     if fails > 0 :
       utils.exit_failure("%s test(s) fail(s)"%(fails))
