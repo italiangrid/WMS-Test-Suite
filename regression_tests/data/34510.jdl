@@ -1,0 +1,151 @@
+[
+  Type = "collection";
+  InputSandbox = {"data/Test.sh"};
+  RetryCount = 1;
+  ShallowRetryCount = 2;
+  Requirements=false;
+
+  nodes = {
+
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+     [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ],
+    [
+        JobType = "Normal";
+        Executable = "Test.sh";
+        StdOutput = "test.out";
+        StdError = "test.err";
+        OutputSandbox = {"test.out"};
+    ]
+  }
+]

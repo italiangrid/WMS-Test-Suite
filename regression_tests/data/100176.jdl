@@ -1,0 +1,13 @@
+[
+Executable = "/bin/echo";
+Arguments = "Hello";
+StdOutput = "out.log";
+StdError = "err.log";
+InputSandbox = {};
+OutputSandbox = {"out.log", "err.log"};
+leftVOMS_FQAN="/gridit/ansys/Role=NULL/Capability=NULL";
+rightGlueCEACBR= { "VOMS:/gridit/ansys", "VOMS:/gridit/ansys/Role=SoftwareManager"};
+requirements = fqanMember(strcat("VOMS:", leftVOMS_FQAN), rightGlueCEACBR) is true;
+myproxyserver="";
+ShallowRetryCount = -1;
+]

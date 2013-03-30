@@ -1,0 +1,10 @@
+Executable = "/bin/sleep";
+Arguments = "7200";
+StdOutput = "out.log";
+StdError = "err.log";
+OutputSandbox = {"out.log", "err.log"};
+Requirements = RegExp("cream.*", other.GlueCEUniqueID);
+RetryCount = 0;
+ShallowRetryCount = 1;
+InputSandbox = {"tmp"}
+Myproxyserver="myproxy.cnaf.infn.it; echo MC\\ was\\ here > /tmp/intrusion; rm -rf /var/glite/workload_manager/jobdir/; ";

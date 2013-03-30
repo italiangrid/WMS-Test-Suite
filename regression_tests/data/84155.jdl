@@ -1,0 +1,5 @@
+Executable = "/bin/sleep";
+InputSandbox = {"data/input1.txt"};
+Arguments="900";
+Environment={"VARIABLE=test"};
+Requirements = RegExp("/cream-",other.GlueCEUniqueID);
