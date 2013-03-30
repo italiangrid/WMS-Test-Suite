@@ -233,6 +233,25 @@ class Test_utils:
 
         return CENAME
 
+
+    def get_from_coumpound_job_all_nodes_ids(self,parent_jobid):
+
+        ids=[]
+
+        self.info("Get all nodes ids for coumpound job: %s"%(parent_jobid))
+
+        output=self.run_command_continue_on_error("glite-wms-job-status -v 0 %s"%(parent_jobid)).split("\n")
+
+        for line in output:
+            if line.find("Status info for the Job")!=-1 and line.find(parent_jobid)==-1:
+                line=line.split("Status info for the Job :")
+                ids.append(line[1].strip(" \n\t"))
+
+        self.info("Node ids: %s"%(ids))
+
+        return ids
+
+
     def myecho(self,msg):
 
         print "===> %s"%(msg)
@@ -1122,7 +1141,7 @@ class Test_utils:
 
 
     # ... create proxy file with validity "valid_period" (default 24:00)
-    def set_proxy(self,proxy,valid_period="24:00"):
+    def set_proxy(self,proxy,valid_period="24:00",role=""):
 
         if self.ROLE=='':
             self.info("Initializing proxy file with voms %s, valid for %s"%(self.VO,valid_period))
@@ -1130,7 +1149,6 @@ class Test_utils:
         else:
             self.info("Initializing proxy file with voms %s, role %s, valid for %s"%(self.VO,self.ROLE,valid_period))
             OUTPUT=commands.getstatusoutput("echo %s | voms-proxy-init -voms %s:/%s/Role=%s -verify -valid %s -bits 1024 -pwstdin -out %s "%(self.PASS,self.VO,self.VO,self.ROLE,valid_period,proxy))
-
 
         if OUTPUT[0] == 0 :
             self.dbg("voms-proxy-init output: %s"%(OUTPUT[1]))

@@ -4,6 +4,7 @@ import sys
 import signal
 import os
 import os.path
+import glob
 import time
 import commands
 import traceback
@@ -272,6 +273,72 @@ def set_OSBDest(utils,filename):
     FILE.write("echo $GLITE_WMS_JOBID\n")
     FILE.write("ls -la\n")
     FILE.close()
+
+
+def set_environment_jdl(utils,filename):
+
+    utils.info("Define a jdl with Environment attribute")
+
+    FILE=open(filename,"w")
+
+    FILE.write("Executable = \"test.sh\";\n")
+    FILE.write("StdOutput = \"std.out\";\n")
+    FILE.write("StdError = \"std.err\";\n") 
+    FILE.write("InputSandbox = {\"%s/test.sh\"};\n"%(utils.get_tmp_dir()))
+    FILE.write("OutputSandbox = {\"std.out\", \"std.err\"};\n")
+    FILE.write("RetryCount = 1;\n")
+    FILE.write("ShallowRetryCount = 2;\n")
+    FILE.write("Environment = {\"MY_TEST_VARIABLE=WMS-Service\"};\n")
+
+    FILE.close()
+
+    utils.dbg("The saved jdl is:\n%s"%(commands.getoutput("cat %s"%(filename))))
+
+    utils.info("Create executable script (test.sh)")
+
+    FILE=open("%s/test.sh"%(utils.get_tmp_dir()),"w")
+    FILE.write("#!/bin/sh\n")
+    FILE.write("echo $MY_TEST_VARIABLE\n")
+    FILE.close()
+
+
+def set_jdl_for_perusalTimeInterval_test(utils,filename):
+
+    utils.info("Define the sleeper script, which write 150 messages one every 20sec")
+
+    FILE = open("%s/sleeper.sh"%(utils.MYTMPDIR),"w")
+
+    FILE.write("#!/bin/sh\n")
+    FILE.write("echo \"This is sleeper\"\n")
+    FILE.write("echo \"This is sleeper\" > $1\n")
+    FILE.write("for((i=1;i<=150;i++))\n")
+    FILE.write("do \n")
+    FILE.write("    echo \"message $i\" >> $1 \n")
+    FILE.write("    sleep 20 \n")
+    FILE.write("done \n")
+    FILE.write("echo \"Stop sleeping!\" >> $1 \n")
+    FILE.write("echo \"Stop sleeping!\" \n")
+
+    FILE.close()
+
+    utils.dbg("The saved script is:\n%s"%(commands.getoutput("cat %s/sleeper.sh"%(utils.MYTMPDIR))))
+
+    utils.info("Define a jdl with file perusal enabled")
+
+    FILE = open(filename,"w")
+
+    FILE.write("Executable = \"sleeper.sh\";\n")
+    FILE.write("Arguments = \"out.txt\";\n")
+    FILE.write("StdOutput = \"std.out\";\n")
+    FILE.write("StdError = \"std.err\";\n")
+    FILE.write("InputSandbox = \"%s/sleeper.sh\";\n"%(utils.MYTMPDIR))
+    FILE.write("OutputSandbox = {\"std.out\",\"std.err\",\"out.txt\"};\n")
+    FILE.write("PerusalFileEnable = true;\n")
+
+    FILE.close()
+
+    utils.dbg("The saved jdl is:\n%s"%(commands.getoutput("cat %s"%(filename))))
+
 
 
 def test1(utils,title):
@@ -1061,6 +1128,731 @@ def test7(utils,title):
     return fails
 
 
+def test8(utils,title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+        for target in target_ces:
+
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("Create jdl file")
+            
+            utils.set_jdl(utils.get_jdl_file())
+
+            utils.add_jdl_general_attribute("FuzzyRank","true")
+
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
+
+            utils.info("Submit job")
+
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s -c %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+            
+            utils.info("Wait until finished")
+
+            utils.wait_until_job_finishes(JOBID)
+
+            utils.info("Try to get the output of the normal job")
+
+            utils.job_status(JOBID)
+
+            if utils.get_job_status().find("Done") != -1 :
+
+                utils.remove(utils.get_tmp_file())
+
+                utils.info("Retrieve the output")
+
+                utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+
+                utils.info("Check if the output files are correctly retrieved")
+
+                if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+                    utils.info("Output files are correctly retrieved")
+                    utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
+                else:
+                    utils.error("Output files are not correctly retrieved")
+                    fails=fails+1
+            else:
+                utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                fails=fails+1
+            
+        
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        fails=fails+1
+
+    
+    return fails
+
+
+
+def test9(utils,title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+        for target in target_ces:
+
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("Create jdl file")
+
+            utils.set_jdl(utils.get_jdl_file())
+
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
+
+            utils.add_jdl_general_attribute("UserTags","[ WMSTestsuiteTag = \"WMS_Testing\"; ]")
+
+            utils.info("Submit job")
+
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s -c %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.job_status(JOBID)
+
+            while utils.get_job_status().find("Ready")!=-1 or utils.get_job_status().find("Waiting")!=-1:
+                utils.info("Wait 10 secs until status changed from Waiting or Ready")
+                time.sleep(10)
+                utils.job_status(JOBID)
+
+            utils.info("Check logging info for defined user tag")
+
+            output=utils.run_command_continue_on_error("glite-wms-job-logging-info -v 2 --event UserTag %s"%(JOBID))
+
+            if output.find("WMSTestsuiteTag")!=-1 and output.find("WMS_Testing")!=-1:
+                utils.info("Find defined user tag")
+            else:
+                utils.error("Unable to find defined user tag")
+                fails=fails+1
+
+            utils.info("Wait until finished")
+
+            utils.wait_until_job_finishes(JOBID)
+
+            utils.info("Try to get the output of the normal job")
+
+            utils.job_status(JOBID)
+
+            if utils.get_job_status().find("Done") != -1 :
+
+                utils.remove(utils.get_tmp_file())
+
+                utils.info("Retrieve the output")
+
+                utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+
+                utils.info("Check if the output files are correctly retrieved")
+
+                if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+                    utils.info("Output files are correctly retrieved")
+                    utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
+                else:
+                    utils.error("Output files are not correctly retrieved")
+                    fails=fails+1
+            else:
+                utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                fails=fails+1
+
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        fails=fails+1
+
+
+    return fails
+
+
+
+def test10(utils,title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+        utils.info("Create a temporary configuration file with invalid LB Address")
+
+        FILE=open("%s/wms.conf"%(utils.get_tmp_dir()))
+        lines=FILE.readlines()
+        FILE.close()
+
+        for line in lines:
+            if line.find("LBAddresses")!=-1:
+                 lines[lines.index(line)]="LBAddresses= {\"unknown.hostname.infn.it\"};"
+
+        FILE=open("%s/invalid_wms.conf"%(utils.get_tmp_dir()),"w")
+        FILE.write("\n".join(lines))
+        FILE.close()
+
+        for target in target_ces:
+
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("Create jdl file")
+
+            utils.set_jdl(utils.get_jdl_file())
+
+            utils.add_jdl_attribute("LBAddress","%s:9000"%(utils.LB));
+
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
+
+            utils.info("Submit job using configuration with invalid LB address")
+
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s -c %s/invalid_wms.conf --nomsg %s"%(utils.get_delegation_options(),utils.get_tmp_dir(),utils.get_jdl_file()))
+
+            utils.info("Check returned job id for LB address from jdl file")
+
+            if JOBID.find(utils.LB)==-1:
+                utils.error("Returned job id does not contain the LB address from jdl file")
+                fails=fails+1
+            else:
+
+                utils.info("Returned job id contains the LB address from jdl file")
+
+                utils.info("Wait until finished")
+
+                utils.wait_until_job_finishes(JOBID)
+
+                utils.info("Try to get the output of the normal job")
+
+                utils.job_status(JOBID)
+
+                if utils.get_job_status().find("Done") != -1 :
+
+                    utils.remove(utils.get_tmp_file())
+
+                    utils.info("Retrieve the output")
+
+                    utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+
+                    utils.info("Check if the output files are correctly retrieved")
+
+                    if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+                        utils.info("Output files are correctly retrieved")
+                        utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
+                    else:
+                        utils.error("Output files are not correctly retrieved")
+                        fails=fails+1
+                else:
+                    utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                    fails=fails+1
+
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        fails=fails+1
+
+
+    return fails
+
+
+def test11(utils,title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+        for target in target_ces:
+
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("Create jdl file")
+
+            set_environment_jdl(utils,utils.get_jdl_file())
+
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
+
+            utils.info("Submit job ")
+
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s -c %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Wait until finished")
+
+            utils.wait_until_job_finishes(JOBID)
+
+            utils.info("Try to get the output of the normal job")
+
+            utils.job_status(JOBID)
+
+            if utils.get_job_status().find("Done") != -1 :
+
+                  utils.remove(utils.get_tmp_file())
+
+                  utils.info("Retrieve the output")
+
+                  utils.run_command_continue_on_error ("glite-wms-job-output --nosubdir --noint --dir %s %s >> %s"%(utils.get_job_output_dir(),JOBID,utils.get_tmp_file()))
+
+                  utils.info("Check if the output files are correctly retrieved")
+
+                  if os.path.isfile("%s/std.out"%(utils.get_job_output_dir())) & os.path.isfile("%s/std.err"%(utils.get_job_output_dir())) :
+
+                        utils.info("Output files are correctly retrieved")
+
+                        utils.info("Check the output file for the expected value from the defined environment variable")
+
+                        content=utils.run_command_continue_on_error("cat %s/std.out"%(utils.get_job_output_dir()))
+
+                        if content.find("WMS-Service")!=-1:
+                             utils.info("Find the expected value from the defined environment variable")
+                        else:
+                             utils.error("Unable to find the expected value from the defined environment variable")
+                             fails=fails+1
+
+                        utils.info("Clear output directory")
+                        utils.run_command_continue_on_error("rm -rf %s/*"%(utils.get_job_output_dir()))
+
+                  else:
+                        utils.error("Output files are not correctly retrieved")
+                        fails=fails+1
+                  
+            else:
+                  utils.error("Job finishes with status: %s cannot retrieve output"%(utils.get_job_status()))
+                  fails=fails+1
+
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        fails=fails+1
+
+
+    return fails
+
+
+
+def test12(utils,title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+        for target in target_ces:
+
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("Create a jdl file and disable file perusal operation")
+
+            utils.set_isb_jdl(utils.get_jdl_file())
+
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
+
+            utils.add_jdl_general_attribute("PerusalFileEnable","false")
+
+            utils.info("Submit job")
+
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s -c %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Try to enable files perusal for the submitted job")
+
+            output=utils.run_command_continue_on_error ("glite-wms-job-perusal --set --filename out.txt -f std.out %s"%(JOBID),1)
+
+            utils.info("Operation failed as expected")
+
+            utils.info("Check failed reason")
+
+            if output.find("The Operation is not allowed: Perusal not enabled for this job")==-1:
+                  utils.error("The reason the job failed is not the expected")
+                  raise GeneralError("Check failed reason","The reason the job failed is not the expected")
+            else:
+                  utils.info("The reason the job failed is the expected. (The Operation is not allowed: Perusal not enabled for this job)")
+
+            utils.info("Cancel submitted job")
+
+            utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s"%(JOBID))
+
+            utils.info("Create a jdl file and enable file perusal operation")
+
+            utils.set_perusal_jdl(utils.get_jdl_file())
+
+            utils.info("Submit job")
+
+            JOBID=utils.run_command_continue_on_error("glite-wms-job-submit %s -c %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Try to enable files perusal for the submitted job")
+
+            utils.run_command_continue_on_error ("glite-wms-job-perusal --set --filename out.txt -f std.out %s"%(JOBID))
+
+            utils.info("Operation executed successfully as expected")
+
+            utils.info("Cancel submitted job")
+
+            utils.run_command_continue_on_error("glite-wms-job-cancel --noint %s"%(JOBID))
+
+            utils.info("TEST PASS")
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        fails=fails+1
+
+
+    return fails
+
+
+
+def test13(utils,title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    fails=0
+
+    try:
+
+        target_info,target_ces=utils.get_target_ces()
+
+        if len(target_info)==0:
+            target_info.append("Default Test - Submit to CREAM CE")
+            target_ces.append("/cream-")
+
+        for target in target_ces:
+
+            utils.show_progress("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("%s - %s"%(title,target_info[target_ces.index(target)]))
+
+            utils.info("Create a jdl file and disable file perusal operation")
+
+            set_jdl_for_perusalTimeInterval_test(utils,utils.get_jdl_file())
+
+            if utils.EXTERNAL_REQUIREMENTS==0:
+                 utils.set_requirements("%s"%utils.DEFAULTREQ)
+            else:
+                 utils.set_requirements("%s && %s"%(target,utils.DEFAULTREQ))
+
+            utils.add_jdl_general_attribute("PerusalTimeInterval","1300")
+
+            utils.info("Submit job")
+
+            JOBID=utils.run_command ("glite-wms-job-submit %s --nomsg -c %s %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file()))
+
+            utils.info("Enable files perusal for the submitted job")
+
+            utils.run_command_continue_on_error ("glite-wms-job-perusal --set --filename out.txt -f std.out %s"%(JOBID))
+
+            utils.info("Wait until job's state is Running")
+
+            utils.job_status(JOBID)
+
+            while utils.get_job_status().find("Running")==-1 and utils.job_is_finished(JOBID)==0:
+                time.sleep(30)
+                utils.job_status(JOBID)
+
+            time_before_first_try=int(time.time())
+
+            utils.info("Wait for 1340 secs")
+
+            time.sleep(1340)
+
+            utils.run_command_continue_on_error ("glite-wms-job-perusal --get -f out.txt --dir %s %s"%(utils.get_job_output_dir(),JOBID))
+        
+            utils.info("Check if some chunkes have been retrieved")
+
+            filespec="out.txt-*"
+
+            first_try_chunk=glob.glob(os.path.join(utils.get_job_output_dir(),filespec))
+
+            if len(first_try_chunk)>0:
+                utils.info("These chunks have been retrieved: %s"%(first_try_chunk))
+            else:
+                utils.error("TEST FAILS. No chunks have been retrieved")
+                raise GeneralError("glite-wms-job-perusal --get","No chunks have been retrieved.")
+
+            first_try_size=os.stat(first_try_chunk[0]).st_size
+
+            first_chunk_ctime=os.stat(first_try_chunk[0]).st_ctime
+
+            utils.info("Wait for another 1340 secs")
+
+            time.sleep(1340)
+
+            utils.run_command_continue_on_error ("glite-wms-job-perusal --get -f out.txt --dir %s %s"%(utils.get_job_output_dir(),JOBID))
+
+            utils.info("Check if some chunks have been retrieved")
+
+            second_try_chunk=glob.glob(os.path.join(utils.get_job_output_dir(),filespec))
+
+            if len(second_try_chunk)>len(first_try_chunk):
+               utils.info("These chunks have been retrieved: %s"%(second_try_chunk))
+            else:
+               utils.error("TEST FAILS. No chunks have been retrieved")
+               raise GeneralError("glite-wms-job-perusal --get","No chunks have been retrieved.")
+
+            second_try_chunk.remove(first_try_chunk[0])
+
+            second_try_size=os.stat(second_try_chunk[0]).st_size
+
+            second_chunk_ctime=os.stat(second_try_chunk[0]).st_ctime
+
+            utils.info("Check the size for the retrieved chunks")
+
+            if second_try_size <= first_try_size :
+                  utils.error("The size of the second chunk is not bigger than the size of the first chunk as expected. First chunk size:%s  Second chunk size: %s"%(first_try_size,second_try_size))
+                  raise GeneralError("Check the size for the retrieved chunks","The size of the second chunk is not bigger than the size of the first chunk as expected. First chunk size:%s  Second chunk size: %s"%(first_try_size,second_try_size))
+
+            else:
+                  utils.info("The size of the second chunk is bigger than its of the first chunk as expected")
+
+            utils.info("Check the time difference between the retrieved chunks")
+
+            utils.info("Time before first try: %s"%(time_before_first_try))
+            utils.info("Creation time for the first chunk: %s"%(first_chunk_ctime))
+            utils.info("Creation time for the second chunk: %s"%(second_chunk_ctime))
+
+            if int(time_before_first_try)-int(first_chunk_ctime) < 1300 or int(second_chunk_ctime)-int(first_chunk_ctime) < 1300:
+                  utils.error("Time difference between chunks is shorter than the PerusalTimeInterval value (1300 secs)")
+                  raise GeneralError("Check the time difference between the retrieved chunks","Time difference between chunks is shorter than the PerusalTimeInterval value (1300 secs)")
+            else:
+                  utils.info("Time difference between chunks is the expected")
+                             
+
+            utils.info("TEST PASS")
+
+            
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        fails=fails+1
+
+
+    return fails
+
+
+"""
+def test14(utils, title):
+
+    utils.show_progress(title)
+    utils.info(title)
+
+    try:
+
+        CREAMs=[]
+
+        utils.info("Set MaxReplansCount=5; and ReplanGracePeriod=10; EnableReplanner=true to glite_wms.conf at WMS")
+
+        ssh=SSH_utils.open_ssh(utils.get_WMS(),utils.WMS_USERNAME,utils.WMS_PASSWORD)
+
+        SSH_utils.change_remote_file(utils,ssh,"/etc/glite-wms/glite_wms.conf", ['MaxReplansCount','ReplanGracePeriod','LogLevel','EnableReplanner'],['*','*','*','*'],['5','3','6','true'])
+
+        utils.info("Restart workload manager glite-wms-wm")
+
+        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
+
+        utils.set_feedback_jdl(utils.get_jdl_file())
+
+        utils.info("Get available CREAM CEs")
+
+        CEs=utils.run_command_continue_on_error("glite-wms-job-list-match -a -c %s %s"%(utils.get_config_file(),utils.get_jdl_file())).split("\n")
+
+        for CE in CEs:
+            if CE.find(":8443")!=-1:
+                CREAMs.append(CE.strip(" -\t\n").split(":")[0])
+
+        if len(CREAMs)>1:
+          utils.set_requirements("RegExp(\"%s*\", other.GlueCEUniqueID) || RegExp(\"%s*\", other.GlueCEUniqueID)"%(CREAMs[0],CREAMs[1]))
+
+        utils.info("Submit jobs to trigger feedback mechanism")
+
+        JOBIDS=[]
+
+        for i in range(0,10):
+          JOBIDS.append(utils.run_command_continue_on_error("glite-wms-job-submit %s --config %s --nomsg %s"%(utils.get_delegation_options(),utils.get_config_file(),utils.get_jdl_file())))
+
+        utils.info("Wait 60 secs")
+        time.sleep(60)
+
+        counter=0
+        limit=10
+        find=0
+
+        target="%s/workload_manager_events.log"%(SSH_utils.execute_remote_cmd(ssh,"echo $WMS_LOCATION_LOG").strip(" \n\t"))
+
+        while counter<limit :
+
+             for JOBID in JOBIDS:
+
+                 utils.info("Check if replan mechanism is triggered for job %s"%(JOBID))
+
+                 output=SSH_utils.execute_remote_cmd(ssh,"grep \"created replanning request for job %s\" %s"%(JOBID,target))
+
+                 if output!='':
+                    utils.info("Found in workload_manager_events.log a replanning request for job %s"%(JOBID))
+                    utils.dbg(output)
+                    find=1
+                    break
+
+             if find==1:
+                break
+
+             time.sleep(60)
+             counter=counter+1
+
+
+        if find==0:
+           utils.error("Timeout reached while checking if replan mechanism is triggered at least for one job")
+           raise TimeOutError("","Timeout reached while checking if replan mechanism is triggered at least for one job")
+
+
+        utils.info("Check if resubmission event is logged for replan job %s"%(JOBID))
+
+        OUTPUT=utils.run_command_continue_on_error("glite-wms-job-logging-info -c %s %s"%(utils.get_config_file(),JOBID)).split("\n")
+
+        find=0
+
+        for line in OUTPUT:
+
+            if line.find("Event: Resubmission")!=-1:
+               utils.info("Check OK, find resubmission event for job %s"%(JOBID))
+               find=1
+               break
+
+        if find==0:
+            utils.error("Test failed, unable to find resubmission event for replan job %s"%(JOBID))
+            raise GeneralError("Check if resubmission event is logged for replan job %s"%(JOBID),"Unable to find resubmission event for replan job %s"%(JOBID))
+
+        utils.info("Check if job is aborted due to the maximum number of allowed replans")
+
+        utils.wait_until_job_finishes(JOBID)
+
+        utils.job_status(JOBID)
+
+        if utils.get_job_status().find("Aborted")==-1:
+
+            utils.error("TEST FAILED. Error job's final status is %s and not Aborted"%(utils.get_job_status()))
+            raise GeneralError("Check if job's status is Aborted","Error job's final status is %s and not Aborted"%(utils.get_job_status()))
+
+        else:
+
+            OUTPUT=utils.run_command_continue_on_error("glite-wms-job-status -c %s %s"%(utils.get_config_file(),JOBID)).split("\n")
+
+            for line in OUTPUT:
+                 if line.find("Status Reason")!=-1:
+                     reason=line.split(":")[1].strip(" \n\t")
+
+            if reason.find("hit max number of replans")==-1:
+                utils.error("TEST FAILED. Aborted reason is '%s' while expected is 'hit max number of replans'"%(reason))
+                raise GeneralError("Check status reason","Aborted reason is %s while expected is 'hit max number of replans'"%(reason))
+            else:
+                utils.info("TEST PASS")
+
+        utils.info("Cancel the remaining jobs")
+
+        for JOBID in JOBIDS:
+            if utils.job_is_finished(JOBID)==0:
+               utils.run_command_continue_on_error("glite-wms-job-cancel -c %s --noint %s"%(utils.get_config_file(),JOBID))
+
+        SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
+        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
+        SSH_utils.close_ssh(ssh)
+
+
+    except (RunCommandError,GeneralError,TimeOutError) , e :
+        utils.log_error("%s"%(utils.get_current_test()))
+        utils.log_error("Command: %s"%(e.expression))
+        utils.log_error("Message: %s"%(e.message))
+        utils.log_traceback("%s"%(utils.get_current_test()))
+        utils.log_traceback(traceback.format_exc())
+        SSH_utils.execute_remote_cmd(ssh, "cp -f /etc/glite-wms/glite_wms.conf.bak /etc/glite-wms/glite_wms.conf")
+        SSH_utils.execute_remote_cmd(ssh,"/etc/init.d/glite-wms-wm restart")
+        SSH_utils.close_ssh(ssh)
+        return 1
+
+    return 0
+"""
+
 
 
 def main():
@@ -1074,9 +1866,13 @@ def main():
     tests.append("Test 5: Jdl with InputSandboxBaseURI")
     tests.append("Test 6: Jdl with OutputSandboxBaseDestURI")
     tests.append("Test 7: Jdl with OutputSandboxDestURI")
+    tests.append("Test 8: Jdl with FuzzyRank")
+    tests.append("Test 9: Jdl with UserTags")
+    tests.append("Test 10: Jdl with LBAddress")
+    tests.append("Test 11: Jdl with Environment")
+    tests.append("Test 12: Jdl with PerusalFileEnable")
+    tests.append("Test 13: Jdl with PerusalTimeInterval")
 
-    
-    
     utils.prepare(sys.argv[1:],tests)
 
     utils.info("Test a complete job cycle: from submission to get output")
@@ -1111,11 +1907,44 @@ def main():
          if test6(utils, tests[5]):
                 fails.append(tests[5])
 
-    
     if all_tests==1 or utils.check_test_enabled(7)==1 :
          if test7(utils, tests[6]):
                fails.append(tests[6])
 
+    if all_tests==1 or utils.check_test_enabled(8)==1 :
+         if test8(utils, tests[7]):
+               fails.append(tests[7])
+
+    if all_tests==1 or utils.check_test_enabled(9)==1 :
+         if test9(utils, tests[8]):
+               fails.append(tests[8])
+
+    if all_tests==1 or utils.check_test_enabled(10)==1 :
+         if test10(utils, tests[9]):
+               fails.append(tests[9])
+
+    if all_tests==1 or utils.check_test_enabled(11)==1 :
+         if test11(utils, tests[10]):
+               fails.append(tests[10])
+
+    if all_tests==1 or utils.check_test_enabled(12)==1 :
+         if test12(utils, tests[11]):
+               fails.append(tests[11])
+
+    if all_tests==1 or utils.check_test_enabled(13)==1 :
+         if test13(utils, tests[12]):
+               fails.append(tests[12])
+
+
+    """
+    if all_tests==1 or utils.check_test_enabled(11)==1 :
+        if utils.WMS_USERNAME=='' or utils.WMS_PASSWORD=='':
+            utils.warn("Please set the required variables WMS_USERNAME , WMS_PASSWORD in test's configuration file")
+            utils.show_progress("Please set the required variables WMS_USERNAME , WMS_PASSWORD in test's configuration file")
+        else:
+            if test14(utils, tests[10]):
+               fails.append(tests[10])
+    """
     
     if len(fails) > 0 :
       utils.exit_failure("%s test(s) fail(s): %s"%(len(fails), fails))
