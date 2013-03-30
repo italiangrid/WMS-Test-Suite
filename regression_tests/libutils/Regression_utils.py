@@ -107,23 +107,9 @@ class Regression_utils:
     def get_log_file(self):
         return self.LOGFILE
 
-    """
-    def get_NOPROXY(self):
-        return self.NOPROXY
-
-    def get_PROXY(self):
-        return self.PROXY
-    """
     def get_job_output_dir(self):
         return self.JOB_OUTPUT_DIR
 
-    """
-    def has_external_jdl(self):
-        return self.EXTERNAL_JDL
-
-    def get_user_CE(self):
-        return self.CE
-    """
     def get_current_test(self):
         return self.CURRENTTEST
 
@@ -225,54 +211,6 @@ class Regression_utils:
         
         return reason
         
-
-    """
-    # Extract the destination CE of the job given as input ($1 must be a valid JOBID)
-    # return CENAME
-    def get_dag_CE(self,jobid):
-
-        CENAME="Destination not available"
-
-        self.verbose ("Look for the destination...")
-
-	# Waiting until job is matched
-
-        self.remove("%s/status.output"%(self.MYTMPDIR))
-
-        self.run_command ("glite-wms-job-status %s >> %s/status.output"%(jobid,self.MYTMPDIR))
-
-        STATUS=self.run_command("grep -m 1 \'Current Status\' %s/status.output | awk -F: \'{print $2}\'"%(self.MYTMPDIR))
-
-        STATUS = string.strip(STATUS)
-
-
-        self.verbose("Wait 30 secs ...")
-        time.sleep(30)
-
-        while STATUS.find("Submitted") != -1 or STATUS.find("Waiting") != -1 :
-            time.sleep(3)
-            self.remove("%s/status.output"%(self.MYTMPDIR))
-            self.run_command ("glite-wms-job-status %s >> %s/status.output"%(jobid,self.MYTMPDIR))
-            STATUS=self.run_command("grep -m 1 \'Current Status\' %s/status.output | awk -F: \'{print $2}\'"%(self.MYTMPDIR))
-            STATUS = string.strip(STATUS)
-
-
-        OUTPUT=commands.getstatusoutput("grep Destination %s/status.output | sed -e \"s/Destination://\" | awk \'{if(NR==2) print $1}\'"%(self.MYTMPDIR))
-
-        if OUTPUT[0] != 0 :
-           self.remove("%s/status.output"%(self.MYTMPDIR))
-           self.exit_failure("Job %s doesn't match"%(jobid))
-
-        self.remove("%s/status.output"%(self.MYTMPDIR))
-
-        CENAME=string.strip(OUTPUT[1])
-
-        self.verbose ("CE id is: %s"%(CENAME))
-
-        return CENAME
-
-   
-    """
 
     ########################## JDL #######################################
 
@@ -451,241 +389,6 @@ class Regression_utils:
 
         FILE.close()
 
-    """
-    def set_parametric_jdl(self,filename):
-
-        self.remove(filename)
-
-        logging.info("Defina a parametric jdl and save it in %s",filename)
-
-        FILE = open(filename,"w")
-
-    
-        FILE.write("JobType = \"Parametric\";\n")
-        FILE.write("Executable = \"/bin/cat\";\n")
-        FILE.write("Arguments = \"input_PARAM_.txt\";\n")
-        FILE.write("StdInput = \"input_PARAM_.txt\";\n")
-        FILE.write("StdOutput = \"output_PARAM_.txt\";\n")
-        FILE.write("StdError = \"error_PARAM_.txt\";\n")
-
-        FILE.write("Parameters=10;\n")
-        FILE.write("ParameterStart=1;\n")
-        FILE.write("ParameterStep=2;\n")
-
-        FILE.write("OutputSandbox = {\"error_PARAM_.txt\",\"output_PARAM_.txt\"};\n")
-        FILE.write("InputSandbox = {\"%s/input_PARAM_.txt\"};\n"%(self.MYTMPDIR))
-        
-        FILE.close()
-
-        FILE=open("%s/input1.txt"%(self.MYTMPDIR),"w")
-        FILE.write("Hello World !!!")
-        FILE.close()
-
-        os.system('cp %s/input1.txt %s/input3.txt'%(self.MYTMPDIR,self.MYTMPDIR))
-        os.system('cp %s/input1.txt %s/input5.txt'%(self.MYTMPDIR,self.MYTMPDIR))
-        os.system('cp %s/input1.txt %s/input7.txt'%(self.MYTMPDIR,self.MYTMPDIR))
-        os.system('cp %s/input1.txt %s/input9.txt'%(self.MYTMPDIR,self.MYTMPDIR))
-
-
-    def set_prologue_jdl(self,filename):
-
-        self.remove(filename)
-
-        logging.info("Defina a jdl with prologue attribute and save it in %s",filename)
-
-        FILE = open(filename,"w")
-
-        FILE.write("Executable = \"exe.sh\";\n")
-	FILE.write("Arguments = \"Executable Arguments\";\n")
-	FILE.write("StdOutput = \"std.out\";\n")
-	FILE.write("Prologue = \"prologue.sh\";\n")
-	FILE.write("PrologueArguments = \"Prologue Arguments\";\n")
-        FILE.write("Environment={\"VAR=TestVariable\"};\n")
-	FILE.write("InputSandbox = {\"%s/exe.sh\", \"%s/prologue.sh\"};\n"%(self.MYTMPDIR,self.MYTMPDIR))
-	FILE.write("OutputSandbox = {\"std.out\", \"prologue.out\"};\n")
-
-        FILE.close()
-
-        FILE = open("%s/prologue.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-	FILE.write("echo \"##########################\" >> prologue.out\n")
-	FILE.write("echo \"This is the prologue script\" >> prologue.out\n")
-	FILE.write("echo \"Start running at `date +%H:%M:%S`\" >> prologue.out\n")
-	FILE.write("echo \"My aurguments are: $@\" >> prologue.out\n")
-	FILE.write("echo \"Check the value of the environment variable: $VAR\" >> prologue.out\n")
-	FILE.write("echo \"Now we 'touch' the file 'prologue'\" >> prologue.out\n")
-	FILE.write("touch prologue\n")
-	FILE.write("echo \"Finish running at `date +%H:%M:%S`\" >> prologue.out\n")
-	FILE.write("echo \"##########################\" >> prologue.out\n")
-
-        FILE.close()
-
-        FILE = open("%s/exe.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-        FILE.write("echo \"##########################\"\n")
-        FILE.write("echo \"This is the executable\"\n")
-        FILE.write("echo \"Start running at `date +%H:%M:%S`\"\n")
-        FILE.write("echo \"Mine aurguments are: $@\"\n")
-        FILE.write("echo \"Check the presence of the file 'prologue'\"\n")
-        FILE.write("ls -l prologue\n")
-        FILE.write("echo \"Check the value of the environment variable: $VAR\"\n")
-        FILE.write("echo \"Now we 'touch' the file 'executable'\"\n")
-        FILE.write("touch executable\n")
-        FILE.write("echo \"Finish running at `date +%H:%M:%S`\"\n")
-        FILE.write("echo \"##########################\"\n")
-
-        FILE.close()
-
-
-    def set_epilogue_jdl(self,filename):
-
-        self.remove(filename)
-
-        logging.info("Defina a jdl with epilogue attribute and save it in %s",filename)
-
-        FILE = open(filename,"w")
-
-        FILE.write("Executable = \"exe.sh\";\n")
-	FILE.write("Arguments = \"Executable Arguments\";\n")
-	FILE.write("StdOutput = \"std.out\";\n")
-	FILE.write("Epilogue = \"epilogue.sh\";\n")
-	FILE.write("EpilogueArguments = \"Epilogue Arguments\";\n")
-        FILE.write("Environment={\"VAR=TestVariable\"};\n")
-	FILE.write("InputSandbox = {\"%s/exe.sh\", \"%s/epilogue.sh\"};\n"%(self.MYTMPDIR,self.MYTMPDIR))
-	FILE.write("OutputSandbox = {\"std.out\", \"epilogue.out\"};\n")
-
-        FILE.close()
-
-        
-        FILE = open("%s/exe.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-        FILE.write("echo \"##########################\"\n")
-        FILE.write("echo \"This is the executable\"\n")
-        FILE.write("echo \"Start running at `date +%H:%M:%S`\"\n")
-        FILE.write("echo \"Mine aurguments are: $@\"\n")
-        FILE.write("echo \"Check the value of the environment variable: $VAR\"\n")
-        FILE.write("echo \"Now we 'touch' the file 'executable'\"\n")
-        FILE.write("touch executable\n")
-        FILE.write("echo \"Finish running at `date +%H:%M:%S`\"\n")
-        FILE.write("echo \"##########################\"\n")
-
-        FILE.close()
-
-
-        FILE = open("%s/epilogue.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-
-        FILE.write("echo \"##########################\"  >> epilogue.out\n")
-        FILE.write("echo \"This is the epilogue\"  >> epilogue.out\n")
-        FILE.write("echo \"Start running at `date +%H:%M:%S`\" >> epilogue.out\n")
-        FILE.write("echo \"Mine aurguments are: $@\" >> epilogue.out\n")
-        FILE.write("echo \"Check the value of the environment variable: $VAR\" >> epilogue.out\n")
-        FILE.write("echo \"Check the presence of the file 'executable'\" >> epilogue.out\n")
-        FILE.write("ls -l executable >> epilogue.out\n")
-        FILE.write("echo \"Finish running at `date +%H:%M:%S`\" >> epilogue.out\n")
-        FILE.write("echo \"All the jokes are done!\" >> epilogue.out\n")
-        FILE.write("echo \"##########################\"  >> epilogue.out\n")
-
-        FILE.close()
-
-
-        
-    def set_prologue_epilogue_jdl(self,filename):
-
-        self.remove(filename)
-
-        logging.info("Defina a jdl with prologue and epilogue attributes and save it in %s",filename)
-
-        FILE = open(filename,"w")
-
-        FILE.write("Executable = \"exe.sh\";\n")
-	FILE.write("Arguments = \"Executable Arguments\";\n")
-	FILE.write("StdOutput = \"std.out\";\n")
-	FILE.write("Prologue = \"prologue.sh\";\n")
-	FILE.write("PrologueArguments = \"Prologue Arguments\";\n")
-	FILE.write("Epilogue = \"epilogue.sh\";\n")
-	FILE.write("EpilogueArguments = \"Epilogue Arguments\";\n")
-	FILE.write("Environment={\"VAR=TestVariable\"};\n")
-	FILE.write("InputSandbox = {\"%s/exe.sh\", \"%s/epilogue.sh\",\"%s/prologue.sh\"};\n"%(self.MYTMPDIR,self.MYTMPDIR,self.MYTMPDIR))
-	FILE.write("OutputSandbox = {\"std.out\", \"prologue.out\", \"epilogue.out\"};\n")
-        
-        FILE.close()
-        
-        FILE = open("%s/prologue.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-	FILE.write("echo \"##########################\" >> prologue.out\n")
-	FILE.write("echo \"This is the prologue script\" >> prologue.out\n")
-	FILE.write("echo \"Start running at `date +%H:%M:%S`\" >> prologue.out\n")
-	FILE.write("echo \"My aurguments are: $@\" >> prologue.out\n")
-	FILE.write("echo \"Check the value of the environment variable: $VAR\" >> prologue.out\n")
-	FILE.write("echo \"Now we 'touch' the file 'prologue'\" >> prologue.out\n")
-	FILE.write("touch prologue\n")
-	FILE.write("echo \"Finish running at `date +%H:%M:%S`\" >> prologue.out\n")
-	FILE.write("echo \"##########################\" >> prologue.out\n")
-
-        FILE.close()
-
-        FILE = open("%s/exe.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-        FILE.write("echo \"##########################\"\n")
-        FILE.write("echo \"This is the executable\"\n")
-        FILE.write("echo \"Start running at `date +%H:%M:%S`\"\n")
-        FILE.write("echo \"Mine aurguments are: $@\"\n")
-        FILE.write("echo \"Check the presence of the file 'prologue'\"\n")
-        FILE.write("ls -l prologue\n")
-        FILE.write("echo \"Check the value of the environment variable: $VAR\"\n")
-        FILE.write("echo \"Now we 'touch' the file 'executable'\"\n")
-        FILE.write("touch executable\n")
-        FILE.write("echo \"Finish running at `date +%H:%M:%S`\"\n")
-        FILE.write("echo \"##########################\"\n")
-
-        FILE.close()
-
-
-        FILE = open("%s/epilogue.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-        
-        FILE.write("echo \"##########################\"  >> epilogue.out\n")
-        FILE.write("echo \"This is the epilogue\"  >> epilogue.out\n")
-        FILE.write("echo \"Start running at `date +%H:%M:%S`\" >> epilogue.out\n")
-        FILE.write("echo \"Mine aurguments are: $@\" >> epilogue.out\n")
-        FILE.write("echo \"Check the value of the environment variable: $VAR\" >> epilogue.out\n")
-        FILE.write("echo \"Check the presence of the files 'prologue' and 'executable'\" >> epilogue.out\n")
-        FILE.write("ls -l prologue >> epilogue.out\n")
-        FILE.write("ls -l executable >> epilogue.out\n")
-        FILE.write("echo \"Finish running at `date +%H:%M:%S`\" >> epilogue.out\n")
-        FILE.write("echo \"All the jokes are done!\" >> epilogue.out\n")
-        FILE.write("echo \"##########################\"  >> epilogue.out\n")
-
-        FILE.close()
-
-
-    def set_perusal_jdl(self,filename):
-
-        self.remove(filename)
-
-        logging.info("Define a jdl with file perusal enabled and save it in %s",filename)
-
-        FILE = open(filename,"w")
-
-        FILE.write("Executable = \"sleeper.sh\";\n")
-        FILE.write("Arguments = \"out.txt\";\n")
-        FILE.write("StdOutput = \"std.out\";\n")
-        FILE.write("StdError = \"std.err\";\n")
-        FILE.write("InputSandbox = \"%s/sleeper.sh\";\n"%(self.MYTMPDIR))
-        FILE.write("OutputSandbox = {\"std.out\",\"std.err\",\"out.txt\"};\n")
-        FILE.write("PerusalFileEnable = true;\n")
-
-        FILE.close()
-
-    """
 
     # define a jdl which trigger one shallow resubmission and save it in filename
     def set_shallow_jdl(self,filename):
@@ -725,57 +428,6 @@ class Regression_utils:
 
         FILE.close()
 
-    """
-    def set_mpi_jdl(self,filename):
-
-        self.remove(filename)
-
-        logging.info("Define a jdl for mpi job and extract required files from openmpi.tar.gz")
-
-        self.run_command("tar xf openmpi.tar.gz -C %s"%(self.MYTMPDIR))
-
-        FILE = open(filename,"w")
-
-        FILE.write("CpuNumber=1;\n")
-        FILE.write("Executable = \"openmpi-wrapper.sh\";\n")
-        FILE.write("Arguments=\"hello\";\n")
-        FILE.write("StdOutput  = \"hello.out\";\n")
-        FILE.write("StdError   = \"hello.err\";\n")
-        FILE.write("OutputSandbox = {\"hello.out\",\"hello.err\"};\n")
-        FILE.write("InputSandbox = {\"%s/openmpi-wrapper.sh\",\"%s/hello.c\",\"%s/Makefile\"};\n"%(self.MYTMPDIR,self.MYTMPDIR,self.MYTMPDIR))
-        FILE.write("Requirements = Member (\"OPENMPI\",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n")
-
-        FILE.close()
-
-
-
-
-
-    def create_sleeper(self):
-
-        print "create sleeper"
-
-        self.remove("%s/sleeper.sh"%(self.MYTMPDIR))
-
-        FILE = open("%s/sleeper.sh"%(self.MYTMPDIR),"w")
-
-        FILE.write("#!/bin/sh\n")
-
-        FILE.write("echo \"This is sleeper\"\n")
-        FILE.write("echo \"This is sleeper\" > $1\n")
-
-        FILE.write("for((i=1;i<=100;i++))\n")
-        FILE.write("do \n")
-        FILE.write("    echo \"message $i\" >> $1 \n")
-        FILE.write("    sleep 15 \n")
-        FILE.write("done \n")
-
-        FILE.write("echo \"Stop sleeping!\" >> $1 \n")
-        FILE.write("echo \"Stop sleeping!\" \n")
-
-        FILE.close()
-
-    """
     # add given requirements  to jdl
     # require: JDLFILE
     def set_requirements(self,requirements):
@@ -791,14 +443,6 @@ class Regression_utils:
         logging.debug("The new saved jdl is:\n%s"%(commands.getoutput("cat %s"%(self.JDLFILE))))
 
 
-    """
-    def set_mpi_destination_ce(self,filename,destination_ce):
-
-         logging.info("Append Requirements expression for the destination CE at the MPI jdl file.")
-         logging.info("Add RegExp(\"%s\",other.GlueCEUniqueID);",destination_ce)
-
-
-    """
     def set_destination_ce(self,filename,destination_ce):
 
          logging.info("Set Requirements expression for the destination CE at the jdl file.")
@@ -837,66 +481,7 @@ class Regression_utils:
 
        FILE.close()
 
-    """
-    # ... get user passwd
-    # --> set PASS
-    def set_pwd(self):
 
-       print ("")
-       #self.PASS = raw_input("Enter the user proxy passwd:")
-       self.PASS=getpass.getpass("Enter the user proxy password:")
-
-
-    # ... create proxy file  with validity (default 24:00)
-    def set_proxy(self,proxy,valid_period):
-
-       if len(valid_period) ==0 :
-          VALID="24:00"
-       else:
-          VALID=valid_period
-
-       self.verbose ("Initializing proxy file ...")
-
-       logging.info("Initializing proxy file with voms %s , valid for %s",self.VO,VALID)
-
-       OUTPUT=commands.getstatusoutput("echo %s | voms-proxy-init -voms %s -verify -valid %s -bits 1024 -pwstdin -out %s "%(self.PASS,self.VO,VALID,proxy))
-
-       if OUTPUT[0] == 0 :
-           self.debug("%s"%(OUTPUT[1]))
-           logging.debug("voms-proxy-init output: %s",OUTPUT[1])
-           os.putenv("X509_USER_PROXY",proxy)
-           logging.info("Set environment variable X509_USER_PROXY to %s",proxy)
-       else:
-           logging.error("Failed to create a valid user proxy")
-           logging.error("voms-proxy-init output : %s",OUTPUT[1])
-           self.exit_failure("Failed to create a valid user proxy")
-
-
-    # ... run command successfuly or exit with cleanup
-    # --> set OUTPUT with command's output
-    def run_command(self,args):
-
-       self.verbose ("")
-       self.verbose ("[ %s ] %s"%(strftime("%H:%M:%S"),args))
-
-       OUTPUT=commands.getstatusoutput(args)
-
-       if OUTPUT[0]!=0 :
-          self.verbose(OUTPUT[1])
-          logging.error('Command %s failed. Failure message: %s',args,OUTPUT[1])
-          self.exit_failure ("%s failed"%(args))
-
-
-       self.debug (OUTPUT[1])
-       self.verbose (" -> Command success")
-
-       logging.info('Command %s executed successfully',args)
-       logging.debug("Command output: %s",OUTPUT[1])
-
-       return OUTPUT[1]
-
-    #
-    """
     def run_command_continue_on_error(self,args):
  
        logging.info ("[ %s ] %s"%(strftime("%H:%M:%S"),args))
@@ -905,7 +490,7 @@ class Regression_utils:
 
        if OUTPUT[0]!=0 :
           logging.error('Command %s failed. Failure message: %s',args,OUTPUT[1])
-          ret=1;
+          ret=1
           raise RunCommandError(args,OUTPUT[1])
           return ret
 
@@ -923,7 +508,7 @@ class Regression_utils:
 
        if OUTPUT[0]==0 :
           logging.error('Command %s not failed as expected'%(args))
-          ret=1;
+          ret=1
           raise RunCommandError(args,"Command %s not failed as expected"%(args))
           return ret
 
@@ -955,6 +540,7 @@ class Regression_utils:
             time.sleep(int(self.SLEEP_TIME))
             counter=counter+1
 
+
     def wait_until_job_finishes_no_timeout_error(self,jobid):
 
         logging.info("Wait until job %s finishes ...",jobid)
@@ -973,38 +559,7 @@ class Regression_utils:
             time.sleep(int(self.SLEEP_TIME))
             counter=counter+1
 
-    """
 
-    # ... delegate proxy and (re-)define DELEGATION_OPTIONS
-    # --> set: DELEGATION_OPTIONS
-    def define_delegation(self):
-
-       self.DELEGATION_OPTIONS="-d del_%s"%(self.ID)
-       self.verbose ("Delegating proxy ...")
-       self.run_command("glite-wms-job-delegate-proxy %s -c %s"%(self.DELEGATION_OPTIONS,self.CONFIG_FILE))
-
-
-    ############### JOB UTILS ####################################
-
-    # submit a job and return JOBID
-    def submit_job(self):
-
-       self.verbose ("Submit a job")
-
-       logging.info("Submit a job")
-
-       JOBID=self.run_command_continue_on_error ("glite-wms-job-submit %s --config %s --nomsg --output %s %s"%(self.DELEGATION_OPTIONS,self.CONFIG_FILE,self.JOBIDFILE,self.JDLFILE))
-
-       logging.info("Job submitted successfuly. Returned JOBID: %s",JOBID)
-
-       # wait until job arrives to wm, needs because there is a bug in the wmproxy.
-       time.sleep(5)
-
-       self.verbose("Submit finished")
-
-       return JOBID
-
-    """
     # Extract the "status" of the job given as input ($1 must be a valid JOBID)
     # --> set JOBSTATUS
     def job_status(self,jobid):
@@ -1081,26 +636,8 @@ class Regression_utils:
 
        return 0
 
-    """
-    def load_job_ids(self,filename):
 
-       jobids=[]
-
-       FILE = open(filename,"r")
-
-       lines = FILE.readlines()
-
-       for line in lines :
-           jobids.append(string.strip(line))
-
-       FILE.close()
-
-       return jobids
-
-"""
-
-
-###############################################################
+    ###############################################################
 
     def prepare(self,args):
 
@@ -1207,24 +744,7 @@ class Regression_utils:
         self.set_jdl(self.JDLFILE)
         self.set_conf(self.CONFIG_FILE)
 
-        """
-       # Create proxy if required
-
-       if self.NOPROXY != 1:
-          self.set_pwd()
-          self.set_proxy(self.PROXY,"")
-       else:
-          voms_info=commands.getstatusoutput("voms-proxy-info -timeleft")
-
-          if voms_info[1].isdigit() == False :
-	     self.set_proxy(self.PROXY,"") # try to create a proxy without pwd
-
-       voms_info=commands.getstatusoutput("voms-proxy-info -timeleft")
-
-       if voms_info[1].isdigit() == False :
-	     self.exit_failure("I don't find neither create any valid proxy")
-        """
-
+    
 
     def load_configuration(self,conf):
 
@@ -1238,6 +758,7 @@ class Regression_utils:
               line=string.strip(line)
               ret=line.split("=")
               setattr(self,'%s'%(ret[0]),ret[1])
+
 
     def show_progress(self,title):
 
