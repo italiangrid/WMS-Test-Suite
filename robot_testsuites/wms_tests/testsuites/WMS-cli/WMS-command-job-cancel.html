@@ -1,0 +1,695 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-command-job-cancel</title>
+</head>
+<body>
+<h1>WMS-command-job-cancel</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">TEST glite-wms-job-cancel command.\n\nAvailable test cases:\n\nTest 1: Check if command exists\nTest 2: Check --version option\nTest 3: Check --config option\nTest 4: Check --output option\nTest 5: Check --logfile option\nTest 6: Check --debug option\nTest 7: Check --input option\nTest 8: Check all options together\nTest 9: Try to cancel a Done-OK job\n</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Collections</td>
+<td># List and dictionary manipulating library</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td># The main WMS testing robot library , implemented as a python module.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td># This is the testsuite's configuration file. It contains a number of variables mandatory or not.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/cli/cancel.py</td>
+<td># Command related utils</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Check Executable">Check Executable</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Exist</td>
+<td>/usr/bin/glite-wms-job-cancel</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --version option">Check --version option</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${OUTPUT}=</td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--version --config ${util.CONFIG_FILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${OUTPUT}</td>
+<td>WMS User Interface version</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --config option">Check --config option</a></td>
+<td>[Tags]</td>
+<td>case3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Status</td>
+<td>${util}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --output option">Check --output option</a></td>
+<td>[Tags]</td>
+<td>case4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.OUTPUTFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE} --output ${util.OUTPUTFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Status</td>
+<td>${util}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.OUTPUTFILE}</td>
+<td>Output file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --logfile option">Check --logfile option</a></td>
+<td>[Tags]</td>
+<td>case5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE} --logfile ${util.LOGFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Status</td>
+<td>${util}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --debug option">Check --debug option</a></td>
+<td>[Tags]</td>
+<td>case6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE} --debug --logfile ${util.LOGFILE}</td>
+<td>${JOBID}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Status</td>
+<td>${util}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${log_info}=</td>
+<td>Get File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${log_info}</td>
+<td>Debug</td>
+<td>Unable to find debug information</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check --input option">Check --input option</a></td>
+<td>[Tags]</td>
+<td>case7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>echo ${JOBID} &gt; ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE} --input ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Status</td>
+<td>${util}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check all options together">Check all options together</a></td>
+<td>[Tags]</td>
+<td>case8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove Files</td>
+<td>${util.LOGFILE}</td>
+<td>${util.OUTPUTFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>echo ${JOBID} &gt; ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Test Cancel</td>
+<td>${util}</td>
+<td>--config ${util.CONFIG_FILE} --debug --logfile ${util.LOGFILE} --output ${util.OUTPUTFILE} --input ${util.MYTMPDIR}/jobid.txt</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Check Status</td>
+<td>${util}</td>
+<td>${JOBID}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.OUTPUTFILE}</td>
+<td>Output file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Not Be Empty</td>
+<td>${util.LOGFILE}</td>
+<td>Log file is empty</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${log_info}=</td>
+<td>Get File</td>
+<td>${util.LOGFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${log_info}</td>
+<td>Debug</td>
+<td>Unable to find debug information</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Try to cancel a Done-OK job">Try to cancel a Done-OK job</a></td>
+<td>[Tags]</td>
+<td>case9</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set JDL</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${JOBID}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Wait Until Job Finishes</td>
+<td>${JOBID}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>glite-wms-job-cancel --noint ${JOBID}</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${util}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${util}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>

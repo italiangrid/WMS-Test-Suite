@@ -1,0 +1,2319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-limiter-mechanism</title>
+</head>
+<body>
+<h1>WMS-limiter-mechanism</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">Test the WMS limiter mechanism operation \n\nAvailable Tests:\n\nTest 1: Test option --load1 threshold for load average (1 min)\nTest 2: Test option --load5 threshold for load average (5 min)\nTest 3: Test option --load15 threshold for load average (15 min)\nTest 4: Test option --memusage threshold for memory usage (%)\nTest 5: Test option --swapusage threshold for swap usage (%)\nTest 6: Test option --ftpconn threshold for number of FTP connections\nTest 7: Test option --diskusage threshold for disk usage (%)\nTest 8: Test option --fdnum threshold for used file descriptor\nTest 9: Test option --jdnum threshold for number of unprocessed jobs (for jobdir)\nTest 10: Test option --jdsize threshold for input jobdir size (KB)\n</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td># This is the testsuite's configuration file. It contains a number of variables mandatory or not.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td># The main WMS testing robot library , implemented as a python module.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/SSH_utils.py</td>
+<td># ssh related methods</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/service/limiter_mechanism.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option load1">Test Option load1</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>1</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --load1, 'Load Average(1 min)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Load Average(1 min):</td>
+<td>Detected threshold is not for parameter load1 ('Load Average(1 min)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --load1 'Load Average (1 min)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --load1, 'Load Average(1 min)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Load Average(1 min):</td>
+<td>Detected threshold is not for parameter load1 ('Load Average(1 min)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --load1 'Load Average (1 min)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option load5">Test Option load5</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>2</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --load5, 'Load Average(5 min)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Load Average(5 min):</td>
+<td>Detected threshold is not for parameter load5 ('Load Average(5 min)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --load5 'Load Average (5 min)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --load5, 'Load Average(5 min)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Load Average(5 min):</td>
+<td>Detected threshold is not for parameter load5 ('Load Average(5 min)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --load5 'Load Average (5 min)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option load15">Test Option load15</a></td>
+<td>[Tags]</td>
+<td>case3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>3</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --load15, 'Load Average(15 min)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Load Average(15 min):</td>
+<td>Detected threshold is not for parameter load5 ('Load Average(15 min)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --load15 'Load Average (15 min)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --load15, 'Load Average(15 min)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Load Average(15 min):</td>
+<td>Detected threshold is not for parameter load5 ('Load Average(15 min)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --load15 'Load Average (15 min)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option memusage">Test Option memusage</a></td>
+<td>[Tags]</td>
+<td>case4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>4</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --memusage, 'Memory Usage'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Memory Usage:</td>
+<td>Detected threshold is not for parameter --memusage ('Memory Usage') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --memusage 'Memory Usage)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --memusage, 'Memory Usage'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Memory Usage:</td>
+<td>Detected threshold is not for parameter --memusage ('Memory Usage') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --memusage 'Memory Usage)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option swapusage">Test Option swapusage</a></td>
+<td>[Tags]</td>
+<td>case5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>5</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --swapusage, 'Swap Usage'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Swap Usage:</td>
+<td>Detected threshold is not for parameter --swapusage ('Swap Usage') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --swapusage 'Swap Usage' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --swapusage, 'Swap Usage'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Swap Usage:</td>
+<td>Detected threshold is not for parameter --swapusage ('Swap Usage') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --swapusage 'Swap Usage' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option ftpconn">Test Option ftpconn</a></td>
+<td>[Tags]</td>
+<td>case6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>6</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --ftpconn, 'FTP Connection'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for FTP Connection:</td>
+<td>Detected threshold is not for parameter --ftpconn ('FTP Connection') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --ftpconn 'FTP Connection' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --ftpconn, 'FTP Connection'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for FTP Connection:</td>
+<td>Detected threshold is not for parameter --ftpconn ('FTP Connection') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --ftpconn 'FTP Connection' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option diskusage">Test Option diskusage</a></td>
+<td>[Tags]</td>
+<td>case7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>7</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --diskusage, 'Disk Usage'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Disk Usage:</td>
+<td>Detected threshold is not for parameter --diskusage ('Disk Usage') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --diskusage 'Disk Usage' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --diskusage, 'Disk Usage'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Disk Usage:</td>
+<td>Detected threshold is not for parameter --diskusage ('Disk Usage') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --diskusage 'Disk Usage' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option fdnum">Test Option fdnum</a></td>
+<td>[Tags]</td>
+<td>case8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>8</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --fdnum, 'Threshold for used file descriptor'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Free FD:</td>
+<td>Detected threshold is not for parameter --fdnum ('Threshold for used file descriptor') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --fdnum 'Threshold for used file descriptor' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --fdnum, 'Threshold for used file descriptor'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for Free FD:</td>
+<td>Detected threshold is not for parameter --fdnum ('Threshold for used file descriptor') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --fdnum 'Threshold for used file descriptor' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option jdnum">Test Option jdnum</a></td>
+<td>[Tags]</td>
+<td>case9</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>9</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --jdnum, 'Threshold for number of unprocessed jobs (for jobdir)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for WMS Input JobDir jobs:</td>
+<td>Detected threshold is not for parameter --jdnum ('Threshold for number of unprocessed jobs (for jobdir)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --jdnum 'Threshold for number of unprocessed jobs (for jobdir)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --jdnum, 'Threshold for number of unprocessed jobs (for jobdir)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for WMS Input JobDir jobs:</td>
+<td>Detected threshold is not for parameter --jdnum ('Threshold for number of unprocessed jobs (for jobdir)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --jdnum 'Threshold for number of unprocessed jobs (for jobdir)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Test Option jdsize">Test Option jdsize</a></td>
+<td>[Tags]</td>
+<td>case10</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>External Log</td>
+<td>${TEST NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Change Configuration</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>10</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Jdl</td>
+<td>${utils.JDLFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Submit Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --jdsize, 'Threshold for input jobdir size (KB)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for WMS Input JobDir size:</td>
+<td>Detected threshold is not for parameter --jdsize ('Threshold for input jobdir size (KB)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --jdsize 'Threshold for input jobdir size (KB)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobSubmit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobSubmit</td>
+<td>Method isn't jobSubmit as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobSubmit as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${message}=</td>
+<td>Test Regiter Operation</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check failed message</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>System load is too high</td>
+<td>Failure reason is not 'System load is too high' as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, the detected failure reason is: 'System load is too high'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if the detected threshold is for parameter --jdsize, 'Threshold for input jobdir size (KB)'</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${message}</td>
+<td>Threshold for WMS Input JobDir size:</td>
+<td>Detected threshold is not for parameter --jdsize ('Threshold for input jobdir size (KB)') as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check OK, detected threshold is for parameter --jdsize 'Threshold for input jobdir size (KB)' as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${method}=</td>
+<td>Get Lines Containing String</td>
+<td>${message}</td>
+<td>Method</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check if method is jobRegister</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Contain</td>
+<td>${method}</td>
+<td>jobRegister</td>
+<td>Method isn't jobRegister as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Method is jobRegister as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Teardown]</td>
+<td>Restore Configuration File</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${WMS_USERNAME}</td>
+<td>Please set the required variables WMS_USERNAME , WMS_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${WMS_PASSWORD}</td>
+<td>Please set the required variables WMS_USERNAME , WMS_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${utils}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${ssh}=</td>
+<td>open_ssh</td>
+<td>${utils.WMS}</td>
+<td>${utils.WMS_USERNAME}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils.WMS_PASSWORD}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${ssh}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Test Submit Operation">Test Submit Operation</a></td>
+<td>[Arguments]</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Submit a job, submission should be failed</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${rc}</td>
+<td>${output}=</td>
+<td>Run And Return Rc And Output</td>
+<td>glite-wms-job-submit ${utils.DELEGATION_OPTIONS} --config ${utils.CONFIG_FILE} ${utils.JDLFILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${rc} == 0</td>
+<td>Fail</td>
+<td>Submission not failed as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Submission successfully failed as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Return]</td>
+<td>${output}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Change Configuration">Change Configuration</a></td>
+<td>[Arguments]</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>${test}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${limit_values}=</td>
+<td>Get Limit Values</td>
+<td>${test}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Limiter Values</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>${limit_values}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Restart worklaod manager proxy glite-wms-wmproxy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Execute Remote Cmd</td>
+<td>${utils}</td>
+<td>${ssh}</td>
+<td>/etc/init.d/glite-wms-wmproxy restart</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Test Regiter Operation">Test Regiter Operation</a></td>
+<td>[Arguments]</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Regiter a job, registration should be failed</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${rc}</td>
+<td>${output}=</td>
+<td>Run And Return Rc And Output</td>
+<td>glite-wms-job-submit ${utils.DELEGATION_OPTIONS} --config ${utils.CONFIG_FILE} --register-only ${utils.JDLFILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${rc} == 0</td>
+<td>Fail</td>
+<td>Registration not failed as expected</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Registration successfully failed as expected</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>[Return]</td>
+<td>${output}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>

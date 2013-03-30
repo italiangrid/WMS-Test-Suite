@@ -1,0 +1,870 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-proxy-renewal</title>
+</head>
+<body>
+<h1>WMS-proxy-renewal</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">WMS Proxy Renewal Test Suite\n\nTest proxy renewal operation\n\nAvailable Tests:\n\nTest 1: Test proxy renewal \nTest 2: Test proxy renewal without setting MYPROXYSERVER\n\n\n</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td># This is the testsuite's configuration file. It contains a number of variables mandatory or not.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td># The main WMS testing robot library , implemented as a python module.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Collections</td>
+<td># List and dictionary manipulating library</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/service/proxy_renewal.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Proxy renewal">Proxy renewal</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${names}</td>
+<td>${ces}=</td>
+<td>Get Target CES</td>
+<td>${CUSTOM_REQUIREMENTS}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${length}=</td>
+<td>Get Length</td>
+<td>${names}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${count}=</td>
+<td>Convert To Integer</td>
+<td>${length}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>: FOR</td>
+<td>${index}</td>
+<td>IN RANGE</td>
+<td>${count}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${name}=</td>
+<td>Get From List</td>
+<td>${names}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${index}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${ce}=</td>
+<td>Get From List</td>
+<td>${ces}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${index}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${ce_length}=</td>
+<td>Get Length</td>
+<td>${ce}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>External Log</td>
+<td>${TEST NAME} - ${name}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Console Log</td>
+<td>${TEST NAME} - ${name}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Add Jdl Attribute</td>
+<td>StdOutput</td>
+<td>std.out</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Add Jdl Attribute</td>
+<td>StdError</td>
+<td>std.err</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Add Jdl General Attribute</td>
+<td>OutputSandbox</td>
+<td>{"std.out","std.err"}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>${ce_length}==0</td>
+<td>Set Requirements</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${util.DEFAULTREQ}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>${ce_length}&gt;0</td>
+<td>Set Requirements</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${ce} &amp;&amp; ${util.DEFAULTREQ}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Add Jdl Attribute</td>
+<td>MyProxyServer</td>
+<td>${util.MYPROXYSERVER}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Log Info</td>
+<td>Submit a job with a short proxy</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Set Proxy</td>
+<td>${util.PROXY}</td>
+<td>00:14</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${jobid}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Log Info</td>
+<td>Check if the job has been submitted with the right proxy</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Check Job Proxy Duration</td>
+<td>${util}</td>
+<td>${jobid}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Set Proxy</td>
+<td>${util.PROXY}</td>
+<td>12:00</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Wait Until Job Finishes</td>
+<td>${jobid}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${status}</td>
+<td>${msg}=</td>
+<td>Run KeyWord And Ignore Error</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Check Proxy Renewal Operation</td>
+<td>${jobid}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>'${status}' == 'FAIL'</td>
+<td>Append to List</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${messages}</td>
+<td>${TEST NAME} - ${name} : ${msg}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>#${final_status}=</td>
+<td>Get Job Status</td>
+<td>${jobid}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>#Run Keyword if</td>
+<td>'${final_status}'=='Aborted'</td>
+<td>Check Failed Reason</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>#${util}</td>
+<td>${jobid}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>#Run Keyword if</td>
+<td>'${final_status}'=='Aborted'</td>
+<td>Fail</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>#Job's final status is Aborted</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>#Run Keyword if</td>
+<td>'${final_status}'=='Cancelled'</td>
+<td>Fail</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>#Job's final status is Cancelled</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>#Run Keyword if</td>
+<td>'${final_status}'=='Done (Failed)'</td>
+<td>Fail</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>#Job's final status is Done (Failed)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>#Log Info</td>
+<td>Test OK</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Proxy renewal without setting MYPROXYSERVER">Proxy renewal without setting MYPROXYSERVER</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${names}</td>
+<td>${ces}=</td>
+<td>Get Target CES</td>
+<td>${CUSTOM_REQUIREMENTS}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${length}=</td>
+<td>Get Length</td>
+<td>${names}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${count}=</td>
+<td>Convert To Integer</td>
+<td>${length}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${messages}=</td>
+<td>Create List</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>: FOR</td>
+<td>${index}</td>
+<td>IN RANGE</td>
+<td>${count}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${name}=</td>
+<td>Get From List</td>
+<td>${names}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${index}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${ce}=</td>
+<td>Get From List</td>
+<td>${ces}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${index}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${ce_length}=</td>
+<td>Get Length</td>
+<td>${ce}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>External Log</td>
+<td>${TEST NAME} - ${name}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Console Log</td>
+<td>${TEST NAME} - ${name}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Set Long Jdl</td>
+<td>${util.JDLFILE}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>${ce_length}==0</td>
+<td>Set Requirements</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${util.DEFAULTREQ}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>${ce_length}&gt;0</td>
+<td>Set Requirements</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${ce} &amp;&amp; ${util.DEFAULTREQ}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Add Jdl Attribute</td>
+<td>MyProxyServer</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Log Info</td>
+<td>Submit a job with a short proxy</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Set Proxy</td>
+<td>${util.PROXY}</td>
+<td>00:14</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${jobid}=</td>
+<td>Submit Job</td>
+<td>${util.JDLFILE}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Log Info</td>
+<td>Check if the job has been submitted with the right proxy</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Check Job Proxy Duration</td>
+<td>${util}</td>
+<td>${jobid}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Set Proxy</td>
+<td>${util.PROXY}</td>
+<td>12:00</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Wait Until Job Finishes</td>
+<td>${jobid}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${final_status}=</td>
+<td>Get Job Status</td>
+<td>${jobid}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>${status}</td>
+<td>${msg}=</td>
+<td>Run KeyWord And Ignore Error</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>Evaluate Test Final Status</td>
+<td>${util}</td>
+<td>${final_status}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${jobid}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td>Run Keyword If</td>
+<td>'${status}'=='FAIL'</td>
+<td>Append to List</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${messages}</td>
+<td>${TEST NAME} - ${name} : ${msg}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${len}=</td>
+<td>Get Length</td>
+<td>${messages}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword If</td>
+<td>${len}&gt;0</td>
+<td>Fail</td>
+<td>${messages}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${PROXY_PASSWORD}</td>
+<td>Please set the required variables PROXY_PASSWORD , MYPROXYSERVER in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${MYPROXYSERVER}</td>
+<td>Please set the required variables PROXY_PASSWORD , MYPROXYSERVER in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${util}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${util}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Check Proxy Renewal Operation">Check Proxy Renewal Operation</a></td>
+<td>[Arguments]</td>
+<td>${jobid}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Check job's final status</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${final_status}=</td>
+<td>Get Job Status</td>
+<td>${jobid}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword if</td>
+<td>'${final_status}'=='Cancelled'</td>
+<td>Fail</td>
+<td>Job's final status is Cancelled</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword if</td>
+<td>'${final_status}'=='Done (Failed)'</td>
+<td>Fail</td>
+<td>Job's final status is Done (Failed)</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Keyword if</td>
+<td>'${final_status}'=='Aborted'</td>
+<td>Check Failed Reason</td>
+<td>${util}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${jobid}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Remove File</td>
+<td>${util.TMPFILE}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Retrieve job's output</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Run Command</td>
+<td>glite-wms-job-output --nosubdir --noint --dir {util.JOB_OUTPUT_DIR} ${jobid}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Exist</td>
+<td>${util.JOB_OUTPUT_DIR}/std.out</td>
+<td>Output files are not correctly retrieved. Unable to find file std.out</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>File Should Exist</td>
+<td>${util.JOB_OUTPUT_DIR}/std.err</td>
+<td>Output files are not correctly retrieved. Unable to find file std.err</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Output files are correctly retrieved</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Log Info</td>
+<td>Test OK</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>

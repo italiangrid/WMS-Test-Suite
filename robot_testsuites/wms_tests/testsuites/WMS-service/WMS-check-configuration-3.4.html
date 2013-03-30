@@ -1,0 +1,436 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+html {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: white;
+  color: black;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em 0em;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 0.1em 0.2em;
+  height: 1.5em;
+  width: 12em;
+}
+td.colspan4, th.colspan4 {
+    width: 48em;
+}
+td.colspan3, th.colspan3 {
+    width: 36em;
+}
+td.colspan2, th.colspan2 {
+    width: 24em;
+}
+th {
+  background-color: rgb(192, 192, 192);
+  color: black;
+  height: 1.7em;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+td.name {
+  background-color: rgb(240, 240, 240);
+  letter-spacing: 0.1em;
+}
+td.name, th.name {
+  width: 10em;
+}
+</style>
+<title>WMS-check-configuration-3.4</title>
+</head>
+<body>
+<h1>WMS-check-configuration-3.4</h1>
+<table border="1" id="setting">
+<tr>
+<th class="name" colspan="5">Settings</th>
+</tr>
+<tr>
+<td class="name">Documentation</td>
+<td class="colspan4" colspan="4">Check the syntax of the WMS configuration file ( glite_wms.conf ) \n\nAvailable Tests:\n\nTest 1: Check common section\nTest 2: Check JobController section\nTest 3: Check NetworkServer section\nTest 4: Check LogMonitor section\nTest 5: Check WorkloadManager section\nTest 6: Check WorkloadManagerProxy section\nTest 7: Check ICE section\nTest 8: Check if attributes match values of yaim variables</td>
+</tr>
+<tr>
+<td class="name">Suite Setup</td>
+<td>Set Environment</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Suite Teardown</td>
+<td>Stop Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/conf.py</td>
+<td># This is the testsuite's configuration file. It contains a number of variables mandatory or not.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/Test_utils.py</td>
+<td># The main WMS testing robot library , implemented as a python module.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>Operating System</td>
+<td># Builtin "Operating System" library,providing keywords for interaction with the system.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>String</td>
+<td># Builtin test library for string manipulation and verification.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Variables</td>
+<td>../../lib/service/check_configuration_attributes_34.py</td>
+<td># Contain the required attributes for the check configuration test</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/SSH_utils.py</td>
+<td># ssh related methods</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name">Library</td>
+<td>../../lib/service/check_configuration_methods_34.py</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="testcase">
+<tr>
+<th class="name" colspan="5">Test Cases</th>
+</tr>
+<tr>
+<td class="name"><a name="test_Check Common Section">Check Common Section</a></td>
+<td>[Tags]</td>
+<td>case1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>Common</td>
+<td>${common_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check JobController Section">Check JobController Section</a></td>
+<td>[Tags]</td>
+<td>case2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>JobController</td>
+<td>${jobcontroller_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check NetworkServer Section">Check NetworkServer Section</a></td>
+<td>[Tags]</td>
+<td>case3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>NetworkServer</td>
+<td>${networkserver_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check LogMonitor Section">Check LogMonitor Section</a></td>
+<td>[Tags]</td>
+<td>case4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>LogMonitor</td>
+<td>${logmonitor_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check WorkloadManager Section">Check WorkloadManager Section</a></td>
+<td>[Tags]</td>
+<td>case5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>WorkloadManager</td>
+<td>${workloadmanager_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check WorkloadManagerProxy Section">Check WorkloadManagerProxy Section</a></td>
+<td>[Tags]</td>
+<td>case6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>WorkloadManagerProxy</td>
+<td>${wmproxy_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check ICE Section">Check ICE Section</a></td>
+<td>[Tags]</td>
+<td>case7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_section</td>
+<td>${utils}</td>
+<td>ICE</td>
+<td>${ice_attributes}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="test_Check Variables">Check Variables</a></td>
+<td>[Tags]</td>
+<td>case8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${utils.YAIM_FILE}</td>
+<td>This test requires the YAIM_FILE configuration file. Please set the YAIM_FILE variable in the test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>check_variables</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<table border="1" id="keyword">
+<tr>
+<th class="name" colspan="5">Keywords</th>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Set Environment">Set Environment</a></td>
+<td>Set Log Level</td>
+<td>${log_level}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Prepare Tests</td>
+<td>${SUITE NAME}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${WMS_USERNAME}</td>
+<td>Please set the required variables WMS_USERNAME , WMS_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Should Not Be Empty</td>
+<td>${WMS_PASSWORD}</td>
+<td>Please set the required variables WMS_USERNAME , WMS_PASSWORD in test's configuration file.</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${utils}=</td>
+<td>Return Object</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Set Global Variable</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>Fetch Configuration File</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Stop Logger">Stop Logger</a></td>
+<td>Close Logger</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"><a name="keyword_Fetch Configuration File">Fetch Configuration File</a></td>
+<td>Log_info</td>
+<td>Get glite_wms.conf file from remote host ${utils.WMS}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>${ssh}=</td>
+<td>open_ssh</td>
+<td>${utils.WMS}</td>
+<td>${utils.WMS_USERNAME}</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils.WMS_PASSWORD}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>ssh_get_file</td>
+<td>${ssh}</td>
+<td>/etc/glite-wms/glite_wms.conf</td>
+<td>${utils.MYTMPDIR}/glite_wms.conf_local</td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>...</td>
+<td>${utils}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td>close_ssh</td>
+<td>${ssh}</td>
+<td>${utils}</td>
+<td></td>
+</tr>
+<tr>
+<td class="name"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>
