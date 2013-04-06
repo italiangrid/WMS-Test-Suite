@@ -2,8 +2,9 @@
 
 """
     Note:
-
-        Mutliprocess part is based on the . from ..
+    
+    Mutliprocess part is based on the CREAM stress test suite [ https://twiki.cern.ch/twiki/bin/view/EMI/CREAMStressTests ]
+    written by Dimosthenes Fioretos dfiore -at- noc -dot- uoa -dot- gr
         
 """
 
