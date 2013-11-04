@@ -4,6 +4,7 @@ from Exceptions import *
 import commands
 import time
 import glob
+import os
 
 def perusal_target_ces(utils,custom_requirements):
 
@@ -110,8 +111,9 @@ def check_forward_parameters(utils,cream_jdl,case):
    params=[
             'CpuNumber = 2,WholeNodes = true,SMPGranularity = 2,Hostnumber = 1',
             'CpuNumber = 1,WholeNodes = true,SMPGranularity = 2',
-            'CpuNumber = 3,WholeNodes = false,SMPGranularity = 3',
-            'CpuNumber = 8,WholeNodes = true,SMPGranularity = 8,Hostnumber = 2'
+            'CpuNumber = 2,WholeNodes = false,SMPGranularity = 1',
+            'CpuNumber = 2,WholeNodes = true,SMPGranularity = 1,Hostnumber = 2',
+            'CpuNumber = 3,WholeNodes = false,SMPGranularity = 3,Hostnumber = 1'
  	  ]    
 
    utils.log_info("Check the cream jdl for the forwarding parameters")
