@@ -59,7 +59,7 @@ def check_prologue_test_output(utils,jobid):
 	status = utils.get_job_status(jobid)
 
 	# Check job's final status	
-	if status.find("Done (Success)")==-1:
+	if status.find("Done(Success)")==-1:
 
 		utils.log_info("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(status))
 		raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(status))
@@ -98,7 +98,7 @@ def check_epilogue_test_output(utils,jobid):
 	status = utils.get_job_status(jobid)
 
 	# Check job's final status	
-	if status.find("Done (Success)")==-1:
+	if status.find("Done(Success)")==-1:
 
 		utils.log_info("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(status))
 		raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(status))
@@ -139,7 +139,7 @@ def check_prologue_epilogue_test_output(utils,jobid):
 	# Get job's final status	
 	status = utils.get_job_status(jobid)
 	
-	if status.find("Done (Success)")==-1:
+	if status.find("Done(Success)")==-1:
 
 		utils.log_info("TEST FAILS. Job finishes with status: %s cannot retrieve output"%(status))
 		raise GeneralError("Check job final status","Job finishes with status %s cannot retrieve output"%(status))
