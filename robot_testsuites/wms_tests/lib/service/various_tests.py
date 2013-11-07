@@ -148,7 +148,7 @@ def check_osb_truncation_output(utils,jobid):
 
 
 
-def script_access_time(data):
+def script_access_time(utils,data):
 
    access_time=''
 
