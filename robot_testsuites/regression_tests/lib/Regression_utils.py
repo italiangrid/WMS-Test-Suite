@@ -642,7 +642,10 @@ class Regression_utils:
 
 
     ###############################################################
-    def prepare(self):
+    def prepare(self,title):
+
+        title = title.replace(" ","-")
+        title = title.replace("&","")
 
         # Test ID
         self.ID=strftime("%Y%m%d%H%M%S")
@@ -653,7 +656,7 @@ class Regression_utils:
            raise GeneralError("","Required configuration variables (WMS,LB,VO) are not set")
  
         # ... create temporary directory
-        self.MYTMPDIR="%s/regression-tests_%s"%(os.getcwd(),self.ID)
+        self.MYTMPDIR="%s/regression-tests_%s_%s"%(os.getcwd(),title,self.ID)
 
         try:
             os.mkdir(self.MYTMPDIR,0755)
@@ -661,9 +664,13 @@ class Regression_utils:
             print "ERROR: Fail to create temporary directory"
             return 1
 
-        self.TESTLOGFILE='RegressionTest_%s.log'%(self.ID)
+        self.TESTLOGFILE='RegressionTest_%s_%s.log'%(title,self.ID)
 
-        self.logger=open(self.TESTLOGFILE,'a')
+        try:
+            self.logger=open(self.TESTLOGFILE,'a')
+        except os.error, e:
+            print "ERROR: Failed to open logfile %s"%(self.TESTLOGFILE)
+            return 1
 
         self.external_log("+++++++++++++++++++++++++++++++++++++++++++++++++++++")
         self.external_log("+ Regression TestSuite ....                         +")
@@ -713,7 +720,7 @@ class Regression_utils:
        for line in lines:
            if line.isspace()==False and line.find("#")==-1:
               tests.append(string.strip(line))
-
+       
        return tests 
 
 
@@ -733,7 +740,7 @@ class Regression_utils:
             module_name="lib.bugs.%s"%(bug)
          
             self.log_info("Try to import module for bug %s"%(bug))
-
+            
             __import__(module_name)
 
             bug_module = sys.modules[module_name]
@@ -753,6 +760,9 @@ class Regression_utils:
             raise GeneralError(e.expression,e.message)
         except ImportError, e:
             self.console_log("ERROR: Unable to find the required module for bug %s . Test is skipped"%(bug))                  
+            self.console_log(e)
+            self.console_log(e.expression)
+            self.console_log(e.message)
             self.log_traceback(traceback.format_exc()) 
             raise GeneralError("Import test module","Unable to find the required module for bug %s.Test is skipped"%(bug)) 
         except :  
