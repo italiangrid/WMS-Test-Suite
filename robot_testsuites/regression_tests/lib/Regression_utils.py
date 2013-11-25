@@ -627,12 +627,12 @@ class Regression_utils:
 
 
        # ... go to the next step if it is a success
-       if self.JOBSTATUS.find('Done (Success)') != -1 :
+       if self.JOBSTATUS.find('Done(Success)') != -1 :
          self.log_info("Job %s finished !"%(jobid))
          return 1
 
 
-       if self.JOBSTATUS.find('Done (Failed)') != -1 :
+       if self.JOBSTATUS.find('Done(Failed)') != -1 :
          self.log_info("Job %s finished !"%(jobid))
          return 6
 
